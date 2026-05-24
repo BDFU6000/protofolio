@@ -48,16 +48,21 @@ class CVGenerator {
     final dir = isArabic ? pw.TextDirection.rtl : pw.TextDirection.ltr;
 
     pdf.addPage(pw.MultiPage(
-      pageFormat: PdfPageFormat.a4,
-      margin: pw.EdgeInsets.zero,
-      theme: pw.ThemeData.withFont(base: regular, bold: bold),
-      textDirection: dir,
       pageTheme: pw.PageTheme(
+        pageFormat: PdfPageFormat.a4,
         margin: pw.EdgeInsets.zero,
+        theme: pw.ThemeData.withFont(base: regular, bold: bold),
+        textDirection: dir,
         buildBackground: (ctx) => pw.Row(
           children: isArabic
-              ? [pw.Expanded(child: pw.Container(color: _white)), pw.Container(width: 188, color: _navy)]
-              : [pw.Container(width: 188, color: _navy), pw.Expanded(child: pw.Container(color: _white))],
+              ? [
+                  pw.Expanded(child: pw.Container(color: _white)),
+                  pw.Container(width: 188, color: _navy)
+                ]
+              : [
+                  pw.Container(width: 188, color: _navy),
+                  pw.Expanded(child: pw.Container(color: _white))
+                ],
         ),
       ),
       build: (ctx) => [
@@ -84,7 +89,7 @@ class CVGenerator {
   // ══════════════════════════════════════════════════════════════════════════
   // MAIN COLUMN (white)
   // ══════════════════════════════════════════════════════════════════════════
-  static pw.Widget _mainCol(
+  static pw.Column _mainCol(
       bool ar, pw.MemoryImage? photo, pw.TextDirection dir) {
     final ca = ar ? pw.CrossAxisAlignment.end : pw.CrossAxisAlignment.start;
     final exps =
@@ -92,73 +97,73 @@ class CVGenerator {
     final projs =
         ar ? PortfolioData.arabicProjects : PortfolioData.englishProjects;
 
-    return pw.Expanded(
-      child: pw.Padding(
-        padding: const pw.EdgeInsets.fromLTRB(34, 34, 26, 26),
-        child: pw.Column(crossAxisAlignment: ca, children: [
-          // ── Header ──────────────────────────────────────────────────────
-          pw.Row(
-              crossAxisAlignment: pw.CrossAxisAlignment.center,
-              children: ar
-                  ? [
-                      pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.end,
-                          children: [
-                            pw.Text(
-                              'عبد المنيب صالح أبوسنة',
-                              textDirection: dir,
-                              style: pw.TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: pw.FontWeight.bold,
-                                  color: _dark),
-                            ),
-                            pw.SizedBox(height: 3),
-                            pw.Text('خريج علوم حاسوب • مطور فلاتر شامل',
-                                textDirection: dir,
-                                style: const pw.TextStyle(
-                                    fontSize: 10.5, color: _gray)),
-                          ]),
-                      pw.SizedBox(width: 14),
-                      if (photo != null) _avatar(photo),
-                    ]
-                  : [
-                      if (photo != null) _avatar(photo),
-                      pw.SizedBox(width: 14),
-                      pw.Column(
-                          crossAxisAlignment: pw.CrossAxisAlignment.start,
-                          children: [
-                            pw.Text('Abd Almoneeb Salah Abusetta',
-                                style: pw.TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: pw.FontWeight.bold,
-                                    color: _dark)),
-                            pw.SizedBox(height: 3),
-                            pw.Text(
-                                'CS Graduate  •  Full-Stack Flutter Developer',
-                                style: const pw.TextStyle(
-                                    fontSize: 10.5, color: _gray)),
-                          ]),
-                    ]),
-          pw.SizedBox(height: 18),
+    pw.Widget pad(pw.Widget child) => pw.Padding(
+        padding: const pw.EdgeInsets.only(left: 34, right: 26), child: child);
 
-          // ── Professional Summary ─────────────────────────────────────────
-          _secHeader(ar ? 'الملخص المهني' : 'Professional Summary', ar),
-          pw.Text(ar ? PortfolioData.arabicBio : PortfolioData.englishBio,
-              textDirection: dir,
-              style: const pw.TextStyle(
-                  fontSize: 9, color: _gray, lineSpacing: 1.5)),
-          pw.SizedBox(height: 14),
+    return pw.Column(crossAxisAlignment: ca, children: [
+      pw.SizedBox(height: 34),
+      // ── Header ──────────────────────────────────────────────────────
+      pad(pw.Row(
+          crossAxisAlignment: pw.CrossAxisAlignment.center,
+          children: ar
+              ? [
+                  pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      children: [
+                        pw.Text(
+                          'عبد المنيب صالح أبوسنة',
+                          textDirection: dir,
+                          style: pw.TextStyle(
+                              fontSize: 22,
+                              fontWeight: pw.FontWeight.bold,
+                              color: _dark),
+                        ),
+                        pw.SizedBox(height: 3),
+                        pw.Text('خريج علوم حاسوب • مطور فلاتر شامل',
+                            textDirection: dir,
+                            style: const pw.TextStyle(
+                                fontSize: 10.5, color: _gray)),
+                      ]),
+                  pw.SizedBox(width: 14),
+                  if (photo != null) _avatar(photo),
+                ]
+              : [
+                  if (photo != null) _avatar(photo),
+                  pw.SizedBox(width: 14),
+                  pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.start,
+                      children: [
+                        pw.Text('Abd Almoneeb Salah Abusetta',
+                            style: pw.TextStyle(
+                                fontSize: 22,
+                                fontWeight: pw.FontWeight.bold,
+                                color: _dark)),
+                        pw.SizedBox(height: 3),
+                        pw.Text('CS Graduate  •  Full-Stack Flutter Developer',
+                            style: const pw.TextStyle(
+                                fontSize: 10.5, color: _gray)),
+                      ]),
+                ])),
+      pw.SizedBox(height: 18),
 
-          // ── Work Experience ──────────────────────────────────────────────
-          _secHeader(ar ? 'الخبرة المهنية' : 'Work Experience', ar),
-          ...exps.map((e) => _expItem(e, ar, dir)),
+      // ── Professional Summary ─────────────────────────────────────────
+      pad(_secHeader(ar ? 'الملخص المهني' : 'Professional Summary', ar)),
+      pad(pw.Text(ar ? PortfolioData.arabicBio : PortfolioData.englishBio,
+          textDirection: dir,
+          style:
+              const pw.TextStyle(fontSize: 9, color: _gray, lineSpacing: 1.5))),
+      pw.SizedBox(height: 14),
 
-          // ── Notable Projects ─────────────────────────────────────────────
-          _secHeader(ar ? 'أبرز المشاريع' : 'Notable Projects', ar),
-          ...projs.map((p) => _projItem(p, ar, dir)),
-        ]),
-      ),
-    );
+      // ── Work Experience ──────────────────────────────────────────────
+      pad(_secHeader(ar ? 'الخبرة المهنية' : 'Work Experience', ar)),
+      ...exps.map((e) => pad(_expItem(e, ar, dir))),
+
+      // ── Notable Projects ─────────────────────────────────────────────
+      pad(_secHeader(ar ? 'أبرز المشاريع' : 'Notable Projects', ar)),
+      ...projs.map((p) => pad(_projItem(p, ar, dir))),
+
+      pw.SizedBox(height: 26),
+    ]);
   }
 
   static pw.Widget _avatar(pw.MemoryImage img) => pw.Container(
@@ -238,8 +243,10 @@ class CVGenerator {
     return pw.Padding(
       padding: const pw.EdgeInsets.only(bottom: 10),
       child: pw.Column(crossAxisAlignment: ca, children: [
-        pw.Text(proj.title, textDirection: dir,
-            style: pw.TextStyle(fontSize: 10.5, fontWeight: pw.FontWeight.bold, color: _dark)),
+        pw.Text(proj.title,
+            textDirection: dir,
+            style: pw.TextStyle(
+                fontSize: 10.5, fontWeight: pw.FontWeight.bold, color: _dark)),
         pw.SizedBox(height: 3),
         pw.Text(proj.description,
             textDirection: dir,
@@ -270,55 +277,58 @@ class CVGenerator {
   // ══════════════════════════════════════════════════════════════════════════
   // SIDEBAR (dark navy)
   // ══════════════════════════════════════════════════════════════════════════
-  static pw.Widget _sidebar(bool ar, pw.MemoryImage? qr) {
+  static pw.Column _sidebar(bool ar, pw.MemoryImage? qr) {
     final ca = ar ? pw.CrossAxisAlignment.end : pw.CrossAxisAlignment.start;
-    return pw.Container(
-      width: 188,
-      color: _navy,
-      padding: const pw.EdgeInsets.fromLTRB(18, 32, 18, 24),
-      child: pw.Column(crossAxisAlignment: ca, children: [
-        // Contact
-        _sideHeader(ar ? 'بيانات التواصل' : 'Contact Details'),
-        _contactItem('Email:', 'moneebabusetta53@gmail.com'),
-        _contactItem('Tel:', '+218 918 474 887'),
-        _contactItem('Insta:', '@moneeb_salah6'),
-        _contactItem('GitHub:', 'github.com/BDFU6000'),
-        pw.SizedBox(height: 18),
+    pw.Widget pad(pw.Widget child) => pw.Padding(
+        padding: const pw.EdgeInsets.symmetric(horizontal: 18), child: child);
 
-        // Skills
-        _sideHeader(ar ? 'المهارات' : 'Skills'),
-        pw.SizedBox(height: 4),
-        ...PortfolioData.skills.take(8).map((s) => _skillRow(s.name, s.level)),
-        pw.SizedBox(height: 18),
+    return pw.Column(crossAxisAlignment: ca, children: [
+      pw.SizedBox(height: 32),
+      // Contact
+      pad(_sideHeader(ar ? 'بيانات التواصل' : 'Contact Details')),
+      pad(_contactItem('Email:', 'moneebabusetta53@gmail.com')),
+      pad(_contactItem('Tel:', '+218 918 474 887')),
+      pad(_contactItem('Insta:', '@moneeb_salah6')),
+      pad(_contactItem('GitHub:', 'github.com/BDFU6000')),
+      pw.SizedBox(height: 18),
 
-        // Languages
-        _sideHeader(ar ? 'اللغات' : 'Languages'),
+      // Skills
+      pad(_sideHeader(ar ? 'المهارات' : 'Skills')),
+      pw.SizedBox(height: 4),
+      ...PortfolioData.skills
+          .take(8)
+          .map((s) => pad(_skillRow(s.name, s.level))),
+      pw.SizedBox(height: 18),
+
+      // Languages
+      pad(_sideHeader(ar ? 'اللغات' : 'Languages')),
+      pw.SizedBox(height: 8),
+      pad(pw.Wrap(spacing: 6, runSpacing: 6, children: [
+        _langPill(ar ? 'العربية' : 'Arabic'),
+        _langPill(ar ? 'الإنجليزية' : 'English'),
+      ])),
+      pw.SizedBox(height: 20),
+
+      // QR
+      if (qr != null) ...[
+        pad(_sideHeader(ar ? 'تواصل معي' : 'Scan to Connect')),
         pw.SizedBox(height: 8),
-        pw.Wrap(spacing: 6, runSpacing: 6, children: [
-          _langPill(ar ? 'العربية' : 'Arabic'),
-          _langPill(ar ? 'الإنجليزية' : 'English'),
-        ]),
-        pw.SizedBox(height: 20),
-
-        // QR
-        if (qr != null) ...[
-          _sideHeader(ar ? 'تواصل معي' : 'Scan to Connect'),
-          pw.SizedBox(height: 8),
-          pw.Container(
-            width: 68,
-            height: 68,
-            decoration: pw.BoxDecoration(
-              color: _white,
-              borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
-              image: pw.DecorationImage(image: qr, fit: pw.BoxFit.cover),
-            ),
+        pad(pw.Container(
+          width: 68,
+          height: 68,
+          decoration: pw.BoxDecoration(
+            color: _white,
+            borderRadius: const pw.BorderRadius.all(pw.Radius.circular(6)),
+            image: pw.DecorationImage(image: qr, fit: pw.BoxFit.cover),
           ),
-          pw.SizedBox(height: 4),
-          pw.Text(ar ? 'انستقرام' : 'Instagram QR',
-              style: const pw.TextStyle(fontSize: 7, color: _sidebarDim)),
-        ],
-      ]),
-    );
+        )),
+        pw.SizedBox(height: 4),
+        pad(pw.Text(ar ? 'انستقرام' : 'Instagram QR',
+            style: const pw.TextStyle(fontSize: 7, color: _sidebarDim))),
+      ],
+
+      pw.SizedBox(height: 24),
+    ]);
   }
 
   static pw.Widget _sideHeader(String title) {
@@ -347,7 +357,8 @@ class CVGenerator {
     return pw.Padding(
       padding: const pw.EdgeInsets.only(bottom: 7),
       child: pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-        pw.Text(label, style: const pw.TextStyle(fontSize: 9, color: _sidebarDim)),
+        pw.Text(label,
+            style: const pw.TextStyle(fontSize: 9, color: _sidebarDim)),
         pw.SizedBox(width: 6),
         pw.Flexible(
             child: pw.Text(text,
