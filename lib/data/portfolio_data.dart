@@ -22,7 +22,7 @@ class PortfolioData {
   // -------------------------------------------------------------------------
 
   static String get name => LocaleProvider.isArabic.value
-      ? 'عبد المنيب صالح أبوسنة'
+      ? 'عبد المنيب صالح أبوستة'
       : 'Abd Almoneeb Salah Abusetta';
 
   static String get tagline => LocaleProvider.isArabic.value
