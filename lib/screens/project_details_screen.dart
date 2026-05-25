@@ -14,6 +14,11 @@ class ProjectDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final gradientColors = project.gradientColors.map((c) => Color(c)).toList();
     final isArabic = LocaleProvider.isArabic.value;
+    final width = MediaQuery.of(context).size.width;
+    final horizontalPadding = width > 600 ? 24.0 : 16.0;
+    final overviewTitleFontSize = width > 600 ? 24.0 : 20.0;
+    final overviewBodyFontSize = width > 600 ? 16.0 : 14.0;
+    final techTitleFontSize = width > 600 ? 20.0 : 18.0;
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0F1E),
@@ -22,7 +27,7 @@ class ProjectDetailsScreen extends StatelessWidget {
           _buildSliverAppBar(context, gradientColors),
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: 32),
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 800),
@@ -34,7 +39,7 @@ class ProjectDetailsScreen extends StatelessWidget {
                           isArabic ? 'نظرة عامة' : 'Overview',
                           style: GoogleFonts.poppins(
                             color: Colors.white,
-                            fontSize: 24,
+                            fontSize: overviewTitleFontSize,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -46,23 +51,23 @@ class ProjectDetailsScreen extends StatelessWidget {
                           project.description,
                           style: GoogleFonts.inter(
                             color: Colors.white70,
-                            fontSize: 16,
+                            fontSize: overviewBodyFontSize,
                             height: 1.6,
                           ),
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 32),
                       if (project.detailedSections != null &&
                           project.detailedSections!.isNotEmpty)
-                        ..._buildDetailedSections(isArabic),
-                      const SizedBox(height: 40),
+                        ..._buildDetailedSections(context, isArabic),
+                      const SizedBox(height: 32),
                       FadeInUp(
                         delay: const Duration(milliseconds: 400),
                         child: Text(
                           isArabic ? 'التقنيات المستخدمة' : 'Technologies Used',
                           style: GoogleFonts.poppins(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: techTitleFontSize,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -71,14 +76,14 @@ class ProjectDetailsScreen extends StatelessWidget {
                       FadeInUp(
                         delay: const Duration(milliseconds: 500),
                         child: Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
+                          spacing: 10,
+                          runSpacing: 10,
                           children: project.technologies
-                              .map((tech) => _buildTechChip(tech))
+                              .map((tech) => _buildTechChip(tech, width > 600))
                               .toList(),
                         ),
                       ),
-                      const SizedBox(height: 80),
+                      const SizedBox(height: 60),
                     ],
                   ),
                 ),
@@ -91,8 +96,14 @@ class ProjectDetailsScreen extends StatelessWidget {
   }
 
   Widget _buildSliverAppBar(BuildContext context, List<Color> gradientColors) {
+    final width = MediaQuery.of(context).size.width;
+    final expandedHeight = width > 600 ? 300.0 : 200.0;
+    final titleFontSize = width > 600 ? 36.0 : 24.0;
+    final imageSize = width > 600 ? 120.0 : 80.0;
+    final emojiSize = width > 600 ? 100.0 : 64.0;
+
     return SliverAppBar(
-      expandedHeight: 300,
+      expandedHeight: expandedHeight,
       pinned: true,
       backgroundColor: const Color(0xFF0A0F1E),
       leading: IconButton(
@@ -118,13 +129,13 @@ class ProjectDetailsScreen extends StatelessWidget {
                           tag: project.title,
                           child: Image.asset(
                             project.imageUrl!,
-                            height: 120,
+                            height: imageSize,
                             fit: BoxFit.contain,
                           ),
                         )
                       : Text(
                           project.emoji,
-                          style: const TextStyle(fontSize: 100),
+                          style: TextStyle(fontSize: emojiSize),
                         ),
                 ),
               ),
@@ -146,18 +157,19 @@ class ProjectDetailsScreen extends StatelessWidget {
               ),
               // Title at the bottom
               Positioned(
-                bottom: 30,
-                left: 24,
-                right: 24,
+                bottom: 20,
+                left: 20,
+                right: 20,
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 800),
                     child: FadeInUp(
                       child: Text(
                         project.title,
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
                           color: Colors.white,
-                          fontSize: 36,
+                          fontSize: titleFontSize,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -172,7 +184,16 @@ class ProjectDetailsScreen extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildDetailedSections(bool isArabic) {
+  List<Widget> _buildDetailedSections(BuildContext context, bool isArabic) {
+    final width = MediaQuery.of(context).size.width;
+    final isMobile = width < 600;
+    final headerFontSize = width > 600 ? 24.0 : 20.0;
+    final sectionPadding = isMobile ? 16.0 : 24.0;
+    final sectionTitleFontSize = width > 600 ? 18.0 : 16.0;
+    final sectionContentFontSize = width > 600 ? 15.0 : 13.5;
+    final iconContainerSize = isMobile ? 40.0 : 48.0;
+    final emojiFontSize = isMobile ? 18.0 : 24.0;
+
     return [
       FadeInUp(
         delay: const Duration(milliseconds: 200),
@@ -180,19 +201,19 @@ class ProjectDetailsScreen extends StatelessWidget {
           isArabic ? 'بنية المشروع والمميزات' : 'Project Architecture & Features',
           style: GoogleFonts.poppins(
             color: Colors.white,
-            fontSize: 24,
+            fontSize: headerFontSize,
             fontWeight: FontWeight.w600,
           ),
         ),
       ),
-      const SizedBox(height: 24),
+      const SizedBox(height: 20),
       ...List.generate(project.detailedSections!.length, (index) {
         final section = project.detailedSections![index];
         return FadeInUp(
           delay: Duration(milliseconds: 300 + (index * 50)),
           child: Container(
-            margin: const EdgeInsets.only(bottom: 24),
-            padding: const EdgeInsets.all(24),
+            margin: const EdgeInsets.only(bottom: 20),
+            padding: EdgeInsets.all(sectionPadding),
             decoration: BoxDecoration(
               color: const Color(0xFF131A2A),
               borderRadius: BorderRadius.circular(16),
@@ -203,15 +224,18 @@ class ProjectDetailsScreen extends StatelessWidget {
               children: [
                 if (section.iconEmoji != null)
                   Container(
-                    margin: const EdgeInsetsDirectional.only(end: 20, top: 4),
-                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsetsDirectional.only(end: 16, top: 2),
+                    width: iconContainerSize,
+                    height: iconContainerSize,
                     decoration: BoxDecoration(
                       color: const Color(0xFF00D4FF).withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Text(
-                      section.iconEmoji!,
-                      style: const TextStyle(fontSize: 24),
+                    child: Center(
+                      child: Text(
+                        section.iconEmoji!,
+                        style: TextStyle(fontSize: emojiFontSize),
+                      ),
                     ),
                   ),
                 Expanded(
@@ -222,16 +246,16 @@ class ProjectDetailsScreen extends StatelessWidget {
                         section.title,
                         style: GoogleFonts.poppins(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: sectionTitleFontSize,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(height: 12),
+                      const SizedBox(height: 8),
                       Text(
                         section.content,
                         style: GoogleFonts.inter(
                           color: Colors.white70,
-                          fontSize: 15,
+                          fontSize: sectionContentFontSize,
                           height: 1.6,
                         ),
                       ),
@@ -246,9 +270,10 @@ class ProjectDetailsScreen extends StatelessWidget {
     ];
   }
 
-  Widget _buildTechChip(String label) {
+  Widget _buildTechChip(String label, bool isLarge) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.symmetric(
+          horizontal: isLarge ? 16.0 : 12.0, vertical: isLarge ? 8.0 : 6.0),
       decoration: BoxDecoration(
         color: const Color(0xFF00D4FF).withOpacity(0.1),
         borderRadius: BorderRadius.circular(12),
@@ -258,7 +283,7 @@ class ProjectDetailsScreen extends StatelessWidget {
         label,
         style: GoogleFonts.inter(
           color: const Color(0xFF00D4FF),
-          fontSize: 14,
+          fontSize: isLarge ? 14.0 : 12.0,
           fontWeight: FontWeight.w500,
         ),
       ),

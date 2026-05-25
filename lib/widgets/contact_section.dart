@@ -15,8 +15,16 @@ class ContactSection extends StatelessWidget {
     return ValueListenableBuilder<bool>(
       valueListenable: LocaleProvider.isArabic,
       builder: (context, isArabic, _) {
+        final width = MediaQuery.of(context).size.width;
+        final horizontalPadding = width > 600 ? 40.0 : 16.0;
+        final topPadding = width > 600 ? 100.0 : 64.0;
+        final bottomPadding = width > 600 ? 40.0 : 32.0;
+        final titleFontSize = width > 600 ? 48.0 : 32.0;
+        final bodyFontSize = width > 600 ? 16.0 : 14.0;
+
         return Container(
-          padding: const EdgeInsets.fromLTRB(40, 100, 40, 40),
+          padding: EdgeInsets.fromLTRB(
+              horizontalPadding, topPadding, horizontalPadding, bottomPadding),
           child: Column(
             children: [
               FadeInUp(
@@ -41,7 +49,7 @@ class ContactSection extends StatelessWidget {
                     isArabic ? 'تواصل معي' : 'Get In Touch',
                     style: GoogleFonts.poppins(
                       color: Colors.white,
-                      fontSize: 48,
+                      fontSize: titleFontSize,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
@@ -61,13 +69,13 @@ class ContactSection extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.inter(
                       color: Colors.white54,
-                      fontSize: 16,
+                      fontSize: bodyFontSize,
                       height: 1.6,
                     ),
                   ),
                 ),
               ),
-              const SizedBox(height: 56),
+              const SizedBox(height: 48),
               // Contact Cards Grid
               FadeInUp(
                 delay: const Duration(milliseconds: 300),
@@ -78,7 +86,7 @@ class ContactSection extends StatelessWidget {
                 delay: const Duration(milliseconds: 450),
                 child: _SayHelloButton(isArabic: isArabic),
               ),
-              const SizedBox(height: 100),
+              const SizedBox(height: 80),
               _Footer(isArabic: isArabic),
             ],
           ),
@@ -132,14 +140,20 @@ class _ContactCardsGrid extends StatelessWidget {
     ];
 
     return LayoutBuilder(builder: (context, constraints) {
-      final crossCount = constraints.maxWidth > 700 ? 4 : 2;
+      final crossCount = constraints.maxWidth > 768
+          ? 4
+          : (constraints.maxWidth > 400 ? 2 : 1);
+      final aspect = constraints.maxWidth > 768
+          ? 1.3
+          : (constraints.maxWidth > 400 ? 1.15 : 2.8);
+
       return GridView.count(
         crossAxisCount: crossCount,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
-        childAspectRatio: 1.3,
+        childAspectRatio: aspect,
         children: cards.map((c) => _ContactCard(data: c, isArabic: isArabic)).toList(),
       );
     });
@@ -192,6 +206,9 @@ class _ContactCardState extends State<_ContactCard> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final cardPadding = width > 500 ? 20.0 : 14.0;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
@@ -201,15 +218,15 @@ class _ContactCardState extends State<_ContactCard> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           transform: Matrix4.translationValues(0, _hovered ? -4 : 0, 0),
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(cardPadding),
           decoration: BoxDecoration(
             color: _hovered
                 ? widget.data.color.withOpacity(0.12)
                 : Colors.white.withOpacity(0.03),
             border: Border.all(
               color: _hovered
-                  ? widget.data.color.withOpacity(0.6)
-                  : Colors.white.withOpacity(0.08),
+                ? widget.data.color.withOpacity(0.6)
+                : Colors.white.withOpacity(0.08),
             ),
             borderRadius: BorderRadius.circular(20),
             boxShadow: _hovered
@@ -223,36 +240,37 @@ class _ContactCardState extends State<_ContactCard> {
                 : [],
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    width: 40,
-                    height: 40,
+                    width: 36,
+                    height: 36,
                     decoration: BoxDecoration(
                       color: widget.data.color.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     child: Icon(widget.data.icon,
-                        color: widget.data.color, size: 20),
+                        color: widget.data.color, size: 18),
                   ),
                   if (widget.data.canCopy)
                     GestureDetector(
                       onTap: () => _copy(context),
-                      child: Icon(Icons.copy_rounded,
+                      behavior: HitTestBehavior.opaque,
+                      child: const Icon(Icons.copy_rounded,
                           color: Colors.white24, size: 16),
                     ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Text(
                 widget.data.label,
                 style: GoogleFonts.inter(
                   color: Colors.white38,
-                  fontSize: 11,
+                  fontSize: 10,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0.5,
                 ),

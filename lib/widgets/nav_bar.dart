@@ -11,12 +11,14 @@ class NavBar extends StatefulWidget {
     required this.sectionKeys,
     required this.activeSection,
     required this.onNavTap,
+    required this.onMenuTap,
   });
 
   final ScrollController scrollController;
   final List<GlobalKey> sectionKeys;
   final int activeSection;
   final ValueChanged<int> onNavTap;
+  final VoidCallback onMenuTap;
 
   @override
   State<NavBar> createState() => _NavBarState();
@@ -47,7 +49,7 @@ class _NavBarState extends State<NavBar> {
     return ValueListenableBuilder<bool>(
       valueListenable: LocaleProvider.isArabic,
       builder: (context, isArabic, _) {
-        final isWide = MediaQuery.of(context).size.width > 768;
+        final isWide = MediaQuery.of(context).size.width > 950;
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -63,17 +65,17 @@ class _NavBarState extends State<NavBar> {
             boxShadow: _isScrolled
                 ? [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 20)
+                        color: Colors.black.withOpacity(0.3), blurRadius: 20)
                   ]
                 : null,
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+          padding:
+              EdgeInsets.symmetric(horizontal: isWide ? 40 : 16, vertical: 16),
           child: Row(
             children: [
-              _Logo(name: PortfolioData.name),
+              Flexible(child: _Logo(name: PortfolioData.name)),
               const Spacer(),
-              if (isWide)
+              if (isWide) ...[
                 Row(
                   children: List.generate(
                     PortfolioData.navItems.length,
@@ -84,14 +86,21 @@ class _NavBarState extends State<NavBar> {
                     ),
                   ),
                 ),
-              const SizedBox(width: 16),
-              _LanguageToggle(isArabic: isArabic),
-              const SizedBox(width: 16),
-              _HireMeButton(
-                isArabic: isArabic,
-                onTap: () =>
-                    widget.onNavTap(PortfolioData.navItems.length - 1),
-              ),
+                const SizedBox(width: 16),
+                _LanguageToggle(isArabic: isArabic),
+                const SizedBox(width: 16),
+                _HireMeButton(
+                  isArabic: isArabic,
+                  onTap: () =>
+                      widget.onNavTap(PortfolioData.navItems.length - 1),
+                ),
+              ] else ...[
+                IconButton(
+                  icon: const Icon(Icons.menu_rounded,
+                      color: Colors.white, size: 28),
+                  onPressed: widget.onMenuTap,
+                ),
+              ],
             ],
           ),
         );
@@ -131,11 +140,15 @@ class _Logo extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 12),
-        Text(name,
-            style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 18)),
+        Flexible(
+          child: Text(name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18)),
+        ),
       ],
     );
   }
@@ -143,9 +156,7 @@ class _Logo extends StatelessWidget {
 
 class _NavLink extends StatefulWidget {
   const _NavLink(
-      {required this.label,
-      required this.isActive,
-      required this.onTap});
+      {required this.label, required this.isActive, required this.onTap});
   final String label;
   final bool isActive;
   final VoidCallback onTap;
@@ -166,8 +177,7 @@ class _NavLinkState extends State<_NavLink> {
       child: GestureDetector(
         onTap: widget.onTap,
         child: Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -177,9 +187,8 @@ class _NavLinkState extends State<_NavLink> {
                     color: (widget.isActive || _hovered)
                         ? const Color(0xFF00D4FF)
                         : Colors.white70,
-                    fontWeight: widget.isActive
-                        ? FontWeight.w600
-                        : FontWeight.w400,
+                    fontWeight:
+                        widget.isActive ? FontWeight.w600 : FontWeight.w400,
                     fontSize: 14),
               ),
               const SizedBox(height: 2),
@@ -200,8 +209,7 @@ class _NavLinkState extends State<_NavLink> {
 }
 
 class _HireMeButton extends StatefulWidget {
-  const _HireMeButton(
-      {required this.onTap, required this.isArabic});
+  const _HireMeButton({required this.onTap, required this.isArabic});
   final VoidCallback onTap;
   final bool isArabic;
 
@@ -222,8 +230,7 @@ class _HireMeButtonState extends State<_HireMeButton> {
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
                 colors: [Color(0xFF00D4FF), Color(0xFF7B2FFF)]),
@@ -240,9 +247,7 @@ class _HireMeButtonState extends State<_HireMeButton> {
           child: Text(
             widget.isArabic ? 'وظفني' : 'Hire Me',
             style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-                fontSize: 14),
+                color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
           ),
         ),
       ),
@@ -262,8 +267,7 @@ class _LanguageToggle extends StatelessWidget {
       onTap: LocaleProvider.toggle,
       borderRadius: BorderRadius.circular(20),
       child: Container(
-        padding:
-            const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.05),
           border: Border.all(color: Colors.white.withOpacity(0.1)),

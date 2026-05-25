@@ -87,39 +87,46 @@ class _HeroSectionState extends State<HeroSection>
           onHover: _updateMouseOffset,
           child: Container(
             width: double.infinity,
-            height: isWide ? size.height : null,
-            constraints:
-                BoxConstraints(minHeight: isWide ? size.height : 700),
+            height: null,
+            constraints: BoxConstraints(minHeight: isWide ? size.height : 700),
             child: Stack(
               children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOut,
-                  transform: Matrix4.translationValues(
-                    _mouseOffset.dx * -30,
-                    _mouseOffset.dy * -30,
-                    0,
+                Positioned.fill(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    curve: Curves.easeOut,
+                    transform: Matrix4.translationValues(
+                      _mouseOffset.dx * -30,
+                      _mouseOffset.dy * -30,
+                      0,
+                    ),
+                    child: _AnimatedBackground(controller: _bgController),
                   ),
-                  child: _AnimatedBackground(controller: _bgController),
                 ),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 100),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: isWide ? 40 : 20,
+                        vertical: isWide ? 100 : 80),
                     child: isWide
                         ? Row(
+                            key: const ValueKey('hero_row_desktop'),
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Expanded(
                                 child: _HeroText(
+                                  key: const ValueKey('hero_text_desktop'),
                                   roleIndex: _roleIndex,
                                   roleController: _roleController,
                                   onLaunch: _launch,
                                   isArabic: isArabic,
+                                  isWide: isWide,
                                 ),
                               ),
                               const SizedBox(width: 60),
                               AnimatedContainer(
+                                key: const ValueKey(
+                                    'hero_avatar_desktop_container'),
                                 duration: const Duration(milliseconds: 200),
                                 curve: Curves.easeOut,
                                 transform: Matrix4.translationValues(
@@ -127,27 +134,40 @@ class _HeroSectionState extends State<HeroSection>
                                   _mouseOffset.dy * 20,
                                   0,
                                 ),
-                                child: _HeroAvatar(isArabic: isArabic),
+                                child: _HeroAvatar(
+                                  key: const ValueKey('hero_avatar_desktop'),
+                                  isArabic: isArabic,
+                                  isWide: isWide,
+                                ),
                               ),
                             ],
                           )
                         : Column(
+                            key: const ValueKey('hero_column_mobile'),
                             mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              _HeroAvatar(isArabic: isArabic),
+                              const SizedBox(height: 40), // spacer for top nav
+                              _HeroAvatar(
+                                key: const ValueKey('hero_avatar_mobile'),
+                                isArabic: isArabic,
+                                isWide: isWide,
+                              ),
                               const SizedBox(height: 40),
                               _HeroText(
+                                key: const ValueKey('hero_text_mobile'),
                                 roleIndex: _roleIndex,
                                 roleController: _roleController,
                                 onLaunch: _launch,
                                 isArabic: isArabic,
+                                isWide: isWide,
                               ),
                             ],
                           ),
                   ),
                 ),
                 Positioned(
-                  bottom: 32,
+                  bottom: 20,
                   left: 0,
                   right: 0,
                   child: _ScrollIndicator(isArabic: isArabic),
@@ -198,14 +218,12 @@ class _OrbPainter extends CustomPainter {
     }
 
     drawOrb(
-      Offset(cx + math.cos(angle) * cx * 0.5,
-          cy - math.sin(angle) * cy * 0.4),
+      Offset(cx + math.cos(angle) * cx * 0.5, cy - math.sin(angle) * cy * 0.4),
       size.width * 0.35,
       const Color(0xFF00D4FF),
     );
     drawOrb(
-      Offset(cx - math.cos(angle) * cx * 0.4,
-          cy + math.sin(angle) * cy * 0.35),
+      Offset(cx - math.cos(angle) * cx * 0.4, cy + math.sin(angle) * cy * 0.35),
       size.width * 0.28,
       const Color(0xFF7B2FFF),
     );
@@ -219,32 +237,39 @@ class _OrbPainter extends CustomPainter {
 
 class _HeroText extends StatelessWidget {
   const _HeroText({
+    super.key,
     required this.roleIndex,
     required this.roleController,
     required this.onLaunch,
     required this.isArabic,
+    required this.isWide,
   });
 
   final int roleIndex;
   final AnimationController roleController;
   final Future<void> Function(String) onLaunch;
   final bool isArabic;
+  final bool isWide;
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final nameFontSize = isWide ? 56.0 : (size.width > 500 ? 44.0 : 30.0);
+    final roleFontSize = isWide ? 28.0 : (size.width > 500 ? 24.0 : 19.0);
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          isWide ? CrossAxisAlignment.start : CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
         // Greeting chip
         FadeInDown(
           duration: const Duration(milliseconds: 600),
           child: Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
             decoration: BoxDecoration(
-              border: Border.all(
-                  color: const Color(0xFF00D4FF).withOpacity(0.5)),
+              border:
+                  Border.all(color: const Color(0xFF00D4FF).withOpacity(0.5)),
               borderRadius: BorderRadius.circular(20),
               color: const Color(0xFF00D4FF).withOpacity(0.08),
             ),
@@ -279,8 +304,9 @@ class _HeroText extends StatelessWidget {
               isArabic
                   ? 'أنا ${PortfolioData.name}'
                   : "I'm ${PortfolioData.name}",
+              textAlign: isWide ? TextAlign.start : TextAlign.center,
               style: GoogleFonts.poppins(
-                fontSize: 56,
+                fontSize: nameFontSize,
                 fontWeight: FontWeight.w800,
                 color: Colors.white,
                 height: 1.1,
@@ -298,6 +324,8 @@ class _HeroText extends StatelessWidget {
             builder: (_, __) => Opacity(
               opacity: (1 - roleController.value).clamp(0.0, 1.0),
               child: Row(
+                mainAxisAlignment:
+                    isWide ? MainAxisAlignment.start : MainAxisAlignment.center,
                 children: [
                   Container(
                     width: 4,
@@ -315,7 +343,7 @@ class _HeroText extends StatelessWidget {
                   Text(
                     PortfolioData.roles[roleIndex],
                     style: GoogleFonts.poppins(
-                      fontSize: 28,
+                      fontSize: roleFontSize,
                       fontWeight: FontWeight.w600,
                       color: const Color(0xFF00D4FF),
                     ),
@@ -332,6 +360,7 @@ class _HeroText extends StatelessWidget {
           delay: const Duration(milliseconds: 600),
           child: Text(
             PortfolioData.tagline,
+            textAlign: isWide ? TextAlign.start : TextAlign.center,
             style: GoogleFonts.inter(
               fontSize: 16,
               color: Colors.white54,
@@ -345,6 +374,7 @@ class _HeroText extends StatelessWidget {
         FadeInUp(
           delay: const Duration(milliseconds: 800),
           child: Wrap(
+            alignment: isWide ? WrapAlignment.start : WrapAlignment.center,
             spacing: 16,
             runSpacing: 12,
             children: [
@@ -354,39 +384,129 @@ class _HeroText extends StatelessWidget {
                 onTap: () {},
               ),
               _OutlineButton(
-                label: isArabic
-                    ? 'تحميل السيرة الذاتية'
-                    : 'Download CV',
+                label: isArabic ? 'تحميل السيرة الذاتية' : 'Download CV',
                 icon: Icons.download_rounded,
                 onTap: () {
                   showDialog(
                     context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: Text(isArabic
-                          ? 'اختر لغة السيرة الذاتية'
-                          : 'Select CV Language'),
-                      content: Text(isArabic
-                          ? 'هل تريد السيرة الذاتية باللغة الإنجليزية أم العربية؟'
-                          : 'Do you want the CV in English or Arabic?'),
-                      actions: [
-                        TextButton(
-                          child: Text(
-                              isArabic ? 'الإنجليزية (English)' : 'English'),
-                          onPressed: () {
-                            Navigator.of(ctx).pop();
-                            CVGenerator.generateAndDownload(isArabic: false);
-                          },
+                    builder: (ctx) => Center(
+                      child: Container(
+                        width: 320,
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF0F172A).withOpacity(0.95),
+                          borderRadius: BorderRadius.circular(24),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.08),
+                            width: 1.5,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.4),
+                              blurRadius: 30,
+                              spreadRadius: 5,
+                            )
+                          ],
                         ),
-                        TextButton(
-                          child: Text(isArabic
-                              ? 'العربية (Arabic)'
-                              : 'عربي (Arabic)'),
-                          onPressed: () {
-                            Navigator.of(ctx).pop();
-                            CVGenerator.generateAndDownload(isArabic: true);
-                          },
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Text(
+                                isArabic ? 'اختر لغة السيرة الذاتية' : 'Select CV Language',
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                isArabic
+                                    ? 'اختر اللغة المفضلة لتنزيل السيرة الذاتية الخاصة بك.'
+                                    : 'Choose your preferred language to download the CV.',
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.inter(
+                                  color: Colors.white54,
+                                  fontSize: 13,
+                                  height: 1.5,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF00D4FF).withOpacity(0.1),
+                                  foregroundColor: const Color(0xFF00D4FF),
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    side: const BorderSide(color: Color(0xFF00D4FF), width: 1),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                  'English Version',
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  Navigator.of(ctx).pop();
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (_) => const _LoadingDialog(isArabic: false),
+                                  );
+                                  try {
+                                    await CVGenerator.generateAndDownload(isArabic: false);
+                                  } catch (_) {
+                                  } finally {
+                                    Navigator.of(context).pop();
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF7B2FFF).withOpacity(0.1),
+                                  foregroundColor: const Color(0xFF7B2FFF),
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    side: const BorderSide(color: Color(0xFF7B2FFF), width: 1),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                child: Text(
+                                  'النسخة العربية',
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
+                                onPressed: () async {
+                                  Navigator.of(ctx).pop();
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (_) => const _LoadingDialog(isArabic: true),
+                                  );
+                                  try {
+                                    await CVGenerator.generateAndDownload(isArabic: true);
+                                  } catch (_) {
+                                  } finally {
+                                    Navigator.of(context).pop();
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
+                      ),
                     ),
                   );
                 },
@@ -399,26 +519,27 @@ class _HeroText extends StatelessWidget {
         // Social links
         FadeInUp(
           delay: const Duration(milliseconds: 1000),
-          child: Row(
+          child: Wrap(
+            alignment: isWide ? WrapAlignment.start : WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 8,
             children: [
               Text(
                 isArabic ? 'جدني على:' : 'Find me on:',
-                style:
-                    GoogleFonts.inter(color: Colors.white38, fontSize: 13),
+                style: GoogleFonts.inter(color: Colors.white38, fontSize: 13),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 8),
               _SocialChip(
                   label: 'GitHub',
                   emoji: '🐙',
                   url: PortfolioData.githubUrl,
                   onLaunch: onLaunch),
-              const SizedBox(width: 8),
               _SocialChip(
                   label: 'LinkedIn',
                   emoji: '💼',
                   url: PortfolioData.linkedinUrl,
                   onLaunch: onLaunch),
-              const SizedBox(width: 8),
               _SocialChip(
                   label: 'Twitter',
                   emoji: '🐦',
@@ -435,8 +556,9 @@ class _HeroText extends StatelessWidget {
 // ── Avatar ────────────────────────────────────────────────────────────────────
 
 class _HeroAvatar extends StatefulWidget {
-  const _HeroAvatar({required this.isArabic});
+  const _HeroAvatar({super.key, required this.isArabic, required this.isWide});
   final bool isArabic;
+  final bool isWide;
 
   @override
   State<_HeroAvatar> createState() => _HeroAvatarState();
@@ -463,6 +585,13 @@ class _HeroAvatarState extends State<_HeroAvatar>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Scale avatar radius down gracefully on small devices to prevent overflow.
+    final double avatarSize =
+        widget.isWide ? 320.0 : (screenWidth - 80).clamp(180.0, 320.0);
+    final double imageSize = avatarSize - 20.0;
+
     return FadeInRight(
       duration: const Duration(milliseconds: 800),
       child: AnimatedBuilder(
@@ -475,8 +604,8 @@ class _HeroAvatarState extends State<_HeroAvatar>
           alignment: Alignment.center,
           children: [
             Container(
-              width: 320,
-              height: 320,
+              width: avatarSize,
+              height: avatarSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: SweepGradient(
@@ -491,24 +620,31 @@ class _HeroAvatarState extends State<_HeroAvatar>
             ClipOval(
               child: Image.asset(
                 'assets/images/Moneeb.jpg',
-                width: 300,
-                height: 300,
+                width: imageSize,
+                height: imageSize,
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  width: imageSize,
+                  height: imageSize,
+                  color: const Color(0xFF131A2A),
+                  child: Center(
+                    child: Text('👨🏻‍💻',
+                        style: TextStyle(fontSize: avatarSize * 0.25)),
+                  ),
+                ),
               ),
             ),
             Positioned(
-              top: 20,
-              right: 10,
+              top: avatarSize * 0.06,
+              right: avatarSize * 0.03,
               child: _FloatingBadge(
-                  emoji: '📱',
-                  label: widget.isArabic ? 'فلاتر' : 'Flutter'),
+                  emoji: '📱', label: widget.isArabic ? 'فلاتر' : 'Flutter'),
             ),
             Positioned(
-              bottom: 20,
-              left: 10,
+              bottom: avatarSize * 0.06,
+              left: avatarSize * 0.03,
               child: _FloatingBadge(
-                  emoji: '🎨',
-                  label: widget.isArabic ? 'فيجما' : 'Figma'),
+                  emoji: '🎨', label: widget.isArabic ? 'فيجما' : 'Figma'),
             ),
           ],
         ),
@@ -528,8 +664,7 @@ class _FloatingBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: const Color(0xFF1a1a2e),
-        border:
-            Border.all(color: const Color(0xFF00D4FF).withOpacity(0.4)),
+        border: Border.all(color: const Color(0xFF00D4FF).withOpacity(0.4)),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -580,8 +715,7 @@ class _GradientButtonState extends State<_GradientButton> {
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
               colors: [Color(0xFF00D4FF), Color(0xFF7B2FFF)],
@@ -638,8 +772,7 @@ class _OutlineButtonState extends State<_OutlineButton> {
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
           decoration: BoxDecoration(
             color: _hovered
                 ? const Color(0xFF00D4FF).withOpacity(0.1)
@@ -698,8 +831,7 @@ class _SocialChipState extends State<_SocialChip> {
         onTap: () => widget.onLaunch(widget.url),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          padding:
-              const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
             color: _hovered
                 ? const Color(0xFF00D4FF).withOpacity(0.15)
@@ -710,12 +842,11 @@ class _SocialChipState extends State<_SocialChip> {
           ),
           child: Row(
             children: [
-              Text(widget.emoji,
-                  style: const TextStyle(fontSize: 12)),
+              Text(widget.emoji, style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 4),
               Text(widget.label,
-                  style: GoogleFonts.inter(
-                      color: Colors.white70, fontSize: 12)),
+                  style:
+                      GoogleFonts.inter(color: Colors.white70, fontSize: 12)),
             ],
           ),
         ),
@@ -766,13 +897,101 @@ class _ScrollIndicatorState extends State<_ScrollIndicator>
           children: [
             Text(
               widget.isArabic ? 'انزل لأسفل' : 'Scroll down',
-              style:
-                  GoogleFonts.inter(color: Colors.white24, fontSize: 12),
+              style: GoogleFonts.inter(color: Colors.white24, fontSize: 12),
             ),
             const SizedBox(height: 6),
             const Icon(Icons.keyboard_arrow_down_rounded,
                 color: Color(0xFF00D4FF), size: 28),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadingDialog extends StatelessWidget {
+  const _LoadingDialog({required this.isArabic});
+  final bool isArabic;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopScope(
+      canPop: false,
+      child: Center(
+        child: FadeIn(
+          duration: const Duration(milliseconds: 300),
+          child: Container(
+            width: 280,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            decoration: BoxDecoration(
+              color: const Color(0xFF0F172A).withOpacity(0.92),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: const Color(0xFF00D4FF).withOpacity(0.2),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF00D4FF).withOpacity(0.15),
+                  blurRadius: 30,
+                  spreadRadius: 2,
+                )
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      SizedBox(
+                        width: 60,
+                        height: 60,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 4,
+                          valueColor: const AlwaysStoppedAnimation<Color>(
+                            Color(0xFF00D4FF),
+                          ),
+                          backgroundColor: const Color(0xFF00D4FF).withOpacity(0.1),
+                        ),
+                      ),
+                      const Icon(
+                        Icons.picture_as_pdf_rounded,
+                        color: Color(0xFF00D4FF),
+                        size: 24,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      colors: [Color(0xFF00D4FF), Color(0xFF7B2FFF)],
+                    ).createShader(bounds),
+                    child: Text(
+                      isArabic ? 'جاري تجهيز السيرة الذاتية' : 'Generating CV...',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    isArabic ? 'يرجى الانتظار قليلاً...' : 'Please wait a moment...',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      color: Colors.white38,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );

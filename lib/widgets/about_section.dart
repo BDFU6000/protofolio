@@ -22,18 +22,38 @@ class AboutSection extends StatelessWidget {
               : 'Passionate Developer,\nCrafting Digital Experiences',
           child: isWide
               ? Row(
+                  key: const ValueKey('about_row_desktop'),
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(flex: 5, child: _BioCard(isArabic: isArabic)),
+                    Expanded(
+                      flex: 5,
+                      child: _BioCard(
+                        key: const ValueKey('about_bio_desktop'),
+                        isArabic: isArabic,
+                      ),
+                    ),
                     const SizedBox(width: 40),
-                    Expanded(flex: 4, child: _StatsGrid(isArabic: isArabic)),
+                    Expanded(
+                      flex: 4,
+                      child: _StatsGrid(
+                        key: const ValueKey('about_stats_desktop'),
+                        isArabic: isArabic,
+                      ),
+                    ),
                   ],
                 )
               : Column(
+                  key: const ValueKey('about_column_mobile'),
                   children: [
-                    _BioCard(isArabic: isArabic),
+                    _BioCard(
+                      key: const ValueKey('about_bio_mobile'),
+                      isArabic: isArabic,
+                    ),
                     const SizedBox(height: 32),
-                    _StatsGrid(isArabic: isArabic),
+                    _StatsGrid(
+                      key: const ValueKey('about_stats_mobile'),
+                      isArabic: isArabic,
+                    ),
                   ],
                 ),
         );
@@ -43,11 +63,12 @@ class AboutSection extends StatelessWidget {
 }
 
 class _BioCard extends StatelessWidget {
-  const _BioCard({required this.isArabic});
+  const _BioCard({super.key, required this.isArabic});
   final bool isArabic;
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     final tags = isArabic
         ? const [
             'مصمم واجهات (Figma)',
@@ -65,7 +86,7 @@ class _BioCard extends StatelessWidget {
     return FadeInLeft(
       duration: const Duration(milliseconds: 600),
       child: Container(
-        padding: const EdgeInsets.all(32),
+        padding: EdgeInsets.all(width > 600 ? 32.0 : 20.0),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.03),
           border: Border.all(color: Colors.white.withOpacity(0.08)),
@@ -149,11 +170,21 @@ class _BioCard extends StatelessWidget {
 }
 
 class _StatsGrid extends StatelessWidget {
-  const _StatsGrid({required this.isArabic});
+  const _StatsGrid({super.key, required this.isArabic});
   final bool isArabic;
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final crossAxisCount = width > 400 ? 2 : 1;
+    final double childAspectRatio = width > 1200
+        ? 1.15
+        : (width > 900
+            ? 0.95
+            : (width > 600
+                ? 1.05
+                : (width > 400 ? 0.95 : 2.2)));
+
     final stats = [
       _StatData(
           value: PortfolioData.yearsOfExperience,
@@ -182,11 +213,12 @@ class _StatsGrid extends StatelessWidget {
     return FadeInRight(
       duration: const Duration(milliseconds: 600),
       child: GridView.count(
-        crossAxisCount: 2,
+        crossAxisCount: crossAxisCount,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
+        childAspectRatio: childAspectRatio,
         children: stats.map((s) => _StatCard(data: s)).toList(),
       ),
     );
@@ -221,7 +253,7 @@ class _StatCardState extends State<_StatCard> {
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         transform: Matrix4.identity()..scale(_hovered ? 1.05 : 1.0),
         decoration: BoxDecoration(
           color: _hovered
@@ -309,8 +341,13 @@ class _SectionWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final horizontalPadding = width > 600 ? 40.0 : 16.0;
+    final verticalPadding = width > 600 ? 80.0 : 48.0;
+    final titleFontSize = width > 600 ? 36.0 : 26.0;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 80),
+      padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: verticalPadding),
       child: Column(
         children: [
           FadeInDown(
@@ -343,13 +380,13 @@ class _SectionWrapper extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(
                     color: Colors.white,
-                    fontSize: 36,
+                    fontSize: titleFontSize,
                     fontWeight: FontWeight.w700,
                     height: 1.25),
               ),
             ),
           ),
-          const SizedBox(height: 56),
+          const SizedBox(height: 48),
           child,
         ],
       ),

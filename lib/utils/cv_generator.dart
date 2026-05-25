@@ -53,16 +53,19 @@ class CVGenerator {
         margin: pw.EdgeInsets.zero,
         theme: pw.ThemeData.withFont(base: regular, bold: bold),
         textDirection: dir,
-        buildBackground: (ctx) => pw.Row(
-          children: isArabic
-              ? [
-                  pw.Expanded(child: pw.Container(color: _white)),
-                  pw.Container(width: 188, color: _navy)
-                ]
-              : [
-                  pw.Container(width: 188, color: _navy),
-                  pw.Expanded(child: pw.Container(color: _white))
-                ],
+        buildBackground: (ctx) => pw.Stack(
+          children: [
+            pw.Positioned.fill(
+              child: pw.Container(color: _white),
+            ),
+            pw.Positioned(
+              top: 0,
+              bottom: 0,
+              left: isArabic ? null : 0,
+              right: isArabic ? 0 : null,
+              child: pw.Container(width: 188, color: _navy),
+            ),
+          ],
         ),
       ),
       build: (ctx) => [
@@ -98,52 +101,36 @@ class CVGenerator {
         ar ? PortfolioData.arabicProjects : PortfolioData.englishProjects;
 
     pw.Widget pad(pw.Widget child) => pw.Padding(
-        padding: const pw.EdgeInsets.only(left: 34, right: 26), child: child);
+        padding: ar
+            ? const pw.EdgeInsets.only(left: 26, right: 34)
+            : const pw.EdgeInsets.only(left: 34, right: 26),
+        child: child);
 
     return pw.Column(crossAxisAlignment: ca, children: [
       pw.SizedBox(height: 34),
       // ── Header ──────────────────────────────────────────────────────
-      pad(pw.Row(
-          crossAxisAlignment: pw.CrossAxisAlignment.center,
-          children: ar
-              ? [
-                  pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.end,
-                      children: [
-                        pw.Text(
-                          'عبد المنيب صالح أبوسنة',
-                          textDirection: dir,
-                          style: pw.TextStyle(
-                              fontSize: 22,
-                              fontWeight: pw.FontWeight.bold,
-                              color: _dark),
-                        ),
-                        pw.SizedBox(height: 3),
-                        pw.Text('خريج علوم حاسوب • مطور فلاتر شامل',
-                            textDirection: dir,
-                            style: const pw.TextStyle(
-                                fontSize: 10.5, color: _gray)),
-                      ]),
-                  pw.SizedBox(width: 14),
-                  if (photo != null) _avatar(photo),
-                ]
-              : [
-                  if (photo != null) _avatar(photo),
-                  pw.SizedBox(width: 14),
-                  pw.Column(
-                      crossAxisAlignment: pw.CrossAxisAlignment.start,
-                      children: [
-                        pw.Text('Abd Almoneeb Salah Abusetta',
-                            style: pw.TextStyle(
-                                fontSize: 22,
-                                fontWeight: pw.FontWeight.bold,
-                                color: _dark)),
-                        pw.SizedBox(height: 3),
-                        pw.Text('CS Graduate  •  Full-Stack Flutter Developer',
-                            style: const pw.TextStyle(
-                                fontSize: 10.5, color: _gray)),
-                      ]),
-                ])),
+      pad(pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.center, children: [
+        if (photo != null) _avatar(photo),
+        pw.SizedBox(width: 14),
+        pw.Column(
+            crossAxisAlignment:
+                ar ? pw.CrossAxisAlignment.end : pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                ar ? 'عبد المنيب صالح أبوسنة' : 'Abd Almoneeb Salah Abusetta',
+                textDirection: dir,
+                style: pw.TextStyle(
+                    fontSize: 22, fontWeight: pw.FontWeight.bold, color: _dark),
+              ),
+              pw.SizedBox(height: 3),
+              pw.Text(
+                  ar
+                      ? 'خريج علوم حاسوب • مطور فلاتر شامل'
+                      : 'CS Graduate  •  Full-Stack Flutter Developer',
+                  textDirection: dir,
+                  style: const pw.TextStyle(fontSize: 10.5, color: _gray)),
+            ]),
+      ])),
       pw.SizedBox(height: 18),
 
       // ── Professional Summary ─────────────────────────────────────────
@@ -285,33 +272,38 @@ class CVGenerator {
     return pw.Column(crossAxisAlignment: ca, children: [
       pw.SizedBox(height: 32),
       // Contact
-      pad(_sideHeader(ar ? 'بيانات التواصل' : 'Contact Details')),
-      pad(_contactItem('Email:', 'moneebabusetta53@gmail.com')),
-      pad(_contactItem('Tel:', '+218 918 474 887')),
-      pad(_contactItem('Insta:', '@moneeb_salah6')),
-      pad(_contactItem('GitHub:', 'github.com/BDFU6000')),
+      pad(_sideHeader(ar ? 'بيانات التواصل' : 'Contact Details', ar)),
+      pad(_contactItem(
+          ar ? 'البريد:' : 'Email:', 'moneebabusetta53@gmail.com', ar)),
+      pad(_contactItem(ar ? 'الهاتف:' : 'Tel:', '+218 918 474 887', ar)),
+      pad(_contactItem(ar ? 'إنستا:' : 'Insta:', '@moneeb_salah6', ar)),
+      pad(_contactItem(ar ? 'جيت هاب:' : 'GitHub:', 'github.com/BDFU6000', ar)),
       pw.SizedBox(height: 18),
 
       // Skills
-      pad(_sideHeader(ar ? 'المهارات' : 'Skills')),
+      pad(_sideHeader(ar ? 'المهارات' : 'Skills', ar)),
       pw.SizedBox(height: 4),
       ...PortfolioData.skills
           .take(8)
-          .map((s) => pad(_skillRow(s.name, s.level))),
+          .map((s) => pad(_skillRow(s.name, s.level, ar))),
       pw.SizedBox(height: 18),
 
       // Languages
-      pad(_sideHeader(ar ? 'اللغات' : 'Languages')),
+      pad(_sideHeader(ar ? 'اللغات' : 'Languages', ar)),
       pw.SizedBox(height: 8),
-      pad(pw.Wrap(spacing: 6, runSpacing: 6, children: [
-        _langPill(ar ? 'العربية' : 'Arabic'),
-        _langPill(ar ? 'الإنجليزية' : 'English'),
-      ])),
+      pad(pw.Wrap(
+          spacing: 6,
+          runSpacing: 6,
+          alignment: ar ? pw.WrapAlignment.end : pw.WrapAlignment.start,
+          children: [
+            _langPill(ar ? 'العربية' : 'Arabic'),
+            _langPill(ar ? 'الإنجليزية' : 'English'),
+          ])),
       pw.SizedBox(height: 20),
 
       // QR
       if (qr != null) ...[
-        pad(_sideHeader(ar ? 'تواصل معي' : 'Scan to Connect')),
+        pad(_sideHeader(ar ? 'تواصل معي' : 'Scan to Connect', ar)),
         pw.SizedBox(height: 8),
         pad(pw.Container(
           width: 68,
@@ -331,12 +323,13 @@ class CVGenerator {
     ]);
   }
 
-  static pw.Widget _sideHeader(String title) {
+  static pw.Widget _sideHeader(String title, bool ar) {
+    final ca = ar ? pw.CrossAxisAlignment.end : pw.CrossAxisAlignment.start;
     return pw.Padding(
       padding: const pw.EdgeInsets.only(bottom: 8),
-      child:
-          pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+      child: pw.Column(crossAxisAlignment: ca, children: [
         pw.Text(title,
+            textDirection: ar ? pw.TextDirection.rtl : pw.TextDirection.ltr,
             style: pw.TextStyle(
                 fontSize: 11, fontWeight: pw.FontWeight.bold, color: _white)),
         pw.SizedBox(height: 3),
@@ -353,47 +346,70 @@ class CVGenerator {
     );
   }
 
-  static pw.Widget _contactItem(String label, String text) {
+  static pw.Widget _contactItem(String label, String text, bool ar) {
     return pw.Padding(
       padding: const pw.EdgeInsets.only(bottom: 7),
-      child: pw.Row(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-        pw.Text(label,
-            style: const pw.TextStyle(fontSize: 9, color: _sidebarDim)),
-        pw.SizedBox(width: 6),
-        pw.Flexible(
-            child: pw.Text(text,
-                style: const pw.TextStyle(fontSize: 8, color: _sidebarDim))),
-      ]),
+      child: pw.Row(
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
+        children: ar
+            ? [
+                pw.Flexible(
+                    child: pw.Text(text,
+                        textDirection: pw.TextDirection.ltr,
+                        style: const pw.TextStyle(
+                            fontSize: 8, color: _sidebarDim))),
+                pw.SizedBox(width: 6),
+                pw.Text(label,
+                    textDirection: pw.TextDirection.rtl,
+                    style: const pw.TextStyle(fontSize: 9, color: _sidebarDim)),
+              ]
+            : [
+                pw.Text(label,
+                    style: const pw.TextStyle(fontSize: 9, color: _sidebarDim)),
+                pw.SizedBox(width: 6),
+                pw.Flexible(
+                    child: pw.Text(text,
+                        style: const pw.TextStyle(
+                            fontSize: 8, color: _sidebarDim))),
+              ],
+      ),
     );
   }
 
-  static pw.Widget _skillRow(String name, double level) {
+  static pw.Widget _skillRow(String name, double level, bool ar) {
+    final ca = ar ? pw.CrossAxisAlignment.end : pw.CrossAxisAlignment.start;
     return pw.Padding(
       padding: const pw.EdgeInsets.only(bottom: 7),
-      child:
-          pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-        pw.Text(name, style: const pw.TextStyle(fontSize: 8.5, color: _white)),
+      child: pw.Column(crossAxisAlignment: ca, children: [
+        pw.Text(name,
+            textDirection: ar ? pw.TextDirection.rtl : pw.TextDirection.ltr,
+            style: const pw.TextStyle(fontSize: 8.5, color: _white)),
         pw.SizedBox(height: 3),
         pw.LayoutBuilder(builder: (ctx, c) {
           final total = c?.maxWidth ?? 148.0;
-          return pw.Stack(children: [
-            pw.Container(
-              height: 5,
-              width: total,
-              decoration: pw.BoxDecoration(
-                color: _navyDim,
-                borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
+          return pw.Stack(
+            alignment: ar ? pw.Alignment.centerRight : pw.Alignment.centerLeft,
+            children: [
+              pw.Container(
+                height: 5,
+                width: total,
+                decoration: pw.BoxDecoration(
+                  color: _navyDim,
+                  borderRadius:
+                      const pw.BorderRadius.all(pw.Radius.circular(3)),
+                ),
               ),
-            ),
-            pw.Container(
-              height: 5,
-              width: total * level,
-              decoration: pw.BoxDecoration(
-                color: _orange,
-                borderRadius: const pw.BorderRadius.all(pw.Radius.circular(3)),
+              pw.Container(
+                height: 5,
+                width: total * level,
+                decoration: pw.BoxDecoration(
+                  color: _orange,
+                  borderRadius:
+                      const pw.BorderRadius.all(pw.Radius.circular(3)),
+                ),
               ),
-            ),
-          ]);
+            ],
+          );
         }),
       ]),
     );

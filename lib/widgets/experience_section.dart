@@ -14,9 +14,14 @@ class ExperienceSection extends StatelessWidget {
     return ValueListenableBuilder<bool>(
       valueListenable: LocaleProvider.isArabic,
       builder: (context, isArabic, _) {
+        final width = MediaQuery.of(context).size.width;
+        final horizontalPadding = width > 600 ? 40.0 : 16.0;
+        final verticalPadding = width > 600 ? 80.0 : 48.0;
+        final titleFontSize = width > 600 ? 36.0 : 26.0;
+
         return Container(
-          padding:
-              const EdgeInsets.symmetric(horizontal: 40, vertical: 80),
+          padding: EdgeInsets.symmetric(
+              horizontal: horizontalPadding, vertical: verticalPadding),
           child: Column(
             children: [
               FadeInDown(
@@ -53,12 +58,12 @@ class ExperienceSection extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: GoogleFonts.poppins(
                         color: Colors.white,
-                        fontSize: 36,
+                        fontSize: titleFontSize,
                         fontWeight: FontWeight.w700),
                   ),
                 ),
               ),
-              const SizedBox(height: 56),
+              const SizedBox(height: 48),
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -91,17 +96,33 @@ class _TimelineItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.of(context).size.width > 768;
+    final width = MediaQuery.of(context).size.width;
+    final isWide = width > 768;
+    final isMobile = width <= 600;
+    final indicatorSize = isMobile ? 36.0 : 48.0;
+    final emojiSize = isMobile ? 16.0 : 20.0;
+    final spacing = isMobile ? 12.0 : 24.0;
 
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Column(
+    return Stack(
+      children: [
+        Padding(
+          padding: EdgeInsetsDirectional.only(
+            start: indicatorSize + spacing,
+            bottom: 32,
+          ),
+          child: _ExperienceCard(
+              experience: experience, isWide: isWide),
+        ),
+        PositionedDirectional(
+          start: 0,
+          top: 0,
+          bottom: 0,
+          width: indicatorSize,
+          child: Column(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: indicatorSize,
+                height: indicatorSize,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: const Color(0xFF00D4FF).withOpacity(0.1),
@@ -111,27 +132,22 @@ class _TimelineItem extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(experience.emoji,
-                      style: const TextStyle(fontSize: 20)),
+                      style: TextStyle(fontSize: emojiSize)),
                 ),
               ),
               if (!isLast)
                 Expanded(
-                  child: Container(
+                  child: Center(
+                    child: Container(
                       width: 2,
-                      color: const Color(0xFF00D4FF).withOpacity(0.2)),
+                      color: const Color(0xFF00D4FF).withOpacity(0.2),
+                    ),
+                  ),
                 ),
             ],
           ),
-          const SizedBox(width: 24),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 40),
-              child: _ExperienceCard(
-                  experience: experience, isWide: isWide),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -151,12 +167,15 @@ class _ExperienceCardState extends State<_ExperienceCard> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final cardPadding = width > 600 ? 24.0 : 16.0;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.all(cardPadding),
         decoration: BoxDecoration(
           color: _hovered
               ? Colors.white.withOpacity(0.05)
