@@ -3,9 +3,9 @@
     "short_name": "my_protofolio",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0B1A33",
+    "theme_color": "#0B1A33",
+    "description": "Abdalmoneeb Abusetta — Mobile Developer & System Architect.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

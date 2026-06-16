@@ -150,7 +150,7 @@ class _BioCard extends StatelessWidget {
             const SizedBox(height: 20),
             Text(
               PortfolioData.bio,
-              style: GoogleFonts.inter(
+              style: (isArabic ? GoogleFonts.cairo : GoogleFonts.inter)(
                 color: Colors.white60,
                 fontSize: 15,
                 height: 1.8,
