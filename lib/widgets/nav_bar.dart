@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../data/portfolio_data.dart';
 import '../utils/locale_provider.dart';
+import '../utils/theme_provider.dart';
 
 class NavBar extends StatefulWidget {
   const NavBar({
@@ -49,28 +50,30 @@ class _NavBarState extends State<NavBar> {
     return ValueListenableBuilder<bool>(
       valueListenable: LocaleProvider.isArabic,
       builder: (context, isArabic, _) {
-        final isWide = MediaQuery.of(context).size.width > 950;
+        final isWide = MediaQuery.of(context).size.width > 920;
+        final inset = MediaQuery.of(context).size.width > 1200 ? 36.0 : 16.0;
+        final isDark = Theme.of(context).brightness == Brightness.dark;
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
           decoration: BoxDecoration(
             color: _isScrolled
-                ? const Color(0xFF0A0F1E).withOpacity(0.95)
+                ? const Color(0xFF032D32).withValues(alpha: .96)
                 : Colors.transparent,
             border: _isScrolled
                 ? Border(
                     bottom: BorderSide(
-                        color: const Color(0xFF00D4FF).withOpacity(0.15)))
+                        color: const Color(0xFF62DADD).withValues(alpha: .12)))
                 : null,
             boxShadow: _isScrolled
                 ? [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.3), blurRadius: 20)
+                        color: Colors.black.withValues(alpha: .18),
+                        blurRadius: 18)
                   ]
                 : null,
           ),
-          padding:
-              EdgeInsets.symmetric(horizontal: isWide ? 40 : 16, vertical: 16),
+          padding: EdgeInsets.symmetric(horizontal: inset, vertical: 12),
           child: Row(
             children: [
               Flexible(child: _Logo(name: PortfolioData.name)),
@@ -88,16 +91,18 @@ class _NavBarState extends State<NavBar> {
                 ),
                 const SizedBox(width: 16),
                 _LanguageToggle(isArabic: isArabic),
-                const SizedBox(width: 16),
+                const SizedBox(width: 10),
                 _HireMeButton(
                   isArabic: isArabic,
                   onTap: () =>
                       widget.onNavTap(PortfolioData.navItems.length - 1),
                 ),
               ] else ...[
+                _ThemeToggle(isDark: isDark),
                 IconButton(
-                  icon: const Icon(Icons.menu_rounded,
-                      color: Colors.white, size: 28),
+                  icon: Icon(Icons.menu_rounded,
+                      color: isDark ? Colors.white : Color(0xFF1D1B1C),
+                      size: 28),
                   onPressed: widget.onMenuTap,
                 ),
               ],
@@ -124,19 +129,21 @@ class _Logo extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 40,
-          height: 40,
+          width: 42,
+          height: 42,
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-                colors: [Color(0xFF00D4FF), Color(0xFF7B2FFF)]),
-            borderRadius: BorderRadius.circular(10),
+              colors: [Color(0xFFFFC900), Color(0xFFFFE36E)],
+            ),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Center(
             child: Text(initials,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.playfairDisplay(
                     color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16)),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    letterSpacing: 1.5)),
           ),
         ),
         const SizedBox(width: 12),
@@ -144,10 +151,13 @@ class _Logo extends StatelessWidget {
           child: Text(name,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: GoogleFonts.poppins(
+              style: (LocaleProvider.isArabic.value
+                      ? GoogleFonts.cairo
+                      : GoogleFonts.playfairDisplay)(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
-                  fontSize: 18)),
+                  fontSize: 18,
+                  letterSpacing: 1.5)),
         ),
       ],
     );
@@ -177,19 +187,22 @@ class _NavLinkState extends State<_NavLink> {
       child: GestureDetector(
         onTap: widget.onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 widget.label,
-                style: GoogleFonts.inter(
+                style: (LocaleProvider.isArabic.value
+                        ? GoogleFonts.cairo
+                        : GoogleFonts.inter)(
                     color: (widget.isActive || _hovered)
-                        ? const Color(0xFF00D4FF)
+                        ? const Color(0xFFFFC900)
                         : Colors.white70,
                     fontWeight:
-                        widget.isActive ? FontWeight.w600 : FontWeight.w400,
-                    fontSize: 14),
+                        widget.isActive ? FontWeight.w600 : FontWeight.w500,
+                    fontSize: 10,
+                    letterSpacing: 0.3),
               ),
               const SizedBox(height: 2),
               AnimatedContainer(
@@ -197,7 +210,7 @@ class _NavLinkState extends State<_NavLink> {
                 height: 2,
                 width: (widget.isActive || _hovered) ? 20 : 0,
                 decoration: BoxDecoration(
-                    color: const Color(0xFF00D4FF),
+                    color: const Color(0xFFFFC900),
                     borderRadius: BorderRadius.circular(2)),
               ),
             ],
@@ -233,12 +246,12 @@ class _HireMeButtonState extends State<_HireMeButton> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-                colors: [Color(0xFF00D4FF), Color(0xFF7B2FFF)]),
-            borderRadius: BorderRadius.circular(24),
+                colors: [Color(0xFFFFC900), Color(0xFFFFD83D)]),
+            borderRadius: BorderRadius.circular(8),
             boxShadow: _hovered
                 ? [
                     const BoxShadow(
-                        color: Color(0x6600D4FF),
+                        color: Color(0x66FFC900),
                         blurRadius: 20,
                         spreadRadius: 2)
                   ]
@@ -246,8 +259,11 @@ class _HireMeButtonState extends State<_HireMeButton> {
           ),
           child: Text(
             widget.isArabic ? 'وظفني' : 'Hire Me',
-            style: GoogleFonts.poppins(
-                color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14),
+            style: (widget.isArabic ? GoogleFonts.cairo : GoogleFonts.inter)(
+                color: const Color(0xFF17383A),
+                fontWeight: FontWeight.w600,
+                fontSize: 12,
+                letterSpacing: 2.2),
           ),
         ),
       ),
@@ -269,24 +285,46 @@ class _LanguageToggle extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.05),
-          border: Border.all(color: Colors.white.withOpacity(0.1)),
+          color: Colors.white.withValues(alpha: .06),
+          border: Border.all(color: Colors.white.withValues(alpha: .14)),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.language, size: 16, color: Colors.white),
+            Icon(
+              Icons.language,
+              size: 16,
+              color: Colors.white,
+            ),
             const SizedBox(width: 6),
             Text(
               isArabic ? 'EN' : 'عربي',
-              style: GoogleFonts.inter(
+              style: (isArabic ? GoogleFonts.cairo : GoogleFonts.inter)(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
                   fontSize: 12),
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _ThemeToggle extends StatelessWidget {
+  const _ThemeToggle({required this.isDark});
+
+  final bool isDark;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      tooltip: isDark ? 'Switch to light mode' : 'Switch to dark mode',
+      onPressed: ThemeProvider.toggle,
+      icon: Icon(
+        isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
+        color: Colors.white,
       ),
     );
   }

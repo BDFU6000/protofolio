@@ -14,10 +14,26 @@ class SkillModel {
   /// Hex color code (without #) for the skill's accent color.
   final String color;
 
+  /// Optional category grouping such as "Mobile Development".
+  final String? category;
+
+  /// Optional summary description used in detail sheets.
+  final String? description;
+
+  /// Optional examples of where the skill was applied.
+  final List<String>? applications;
+
+  /// Optional related project names for context.
+  final List<String>? relatedProjects;
+
   const SkillModel({
     required this.name,
     required this.emoji,
     required this.level,
     required this.color,
+    this.category,
+    this.description,
+    this.applications,
+    this.relatedProjects,
   });
 }

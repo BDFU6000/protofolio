@@ -20,6 +20,18 @@ class ExperienceModel {
   /// Emoji representing the type of company (e.g. "🏥", "🛒", "🚀").
   final String emoji;
 
+  /// Optional fuller summary used in modal detail sheets.
+  final String? detailSummary;
+
+  /// Optional responsibilities used in expanded views.
+  final List<String>? responsibilities;
+
+  /// Optional achievements used in expanded views.
+  final List<String>? achievements;
+
+  /// Optional related projects to surface in expanded views.
+  final List<String>? relatedProjects;
+
   const ExperienceModel({
     required this.role,
     required this.company,
@@ -27,5 +39,9 @@ class ExperienceModel {
     required this.description,
     required this.technologies,
     required this.emoji,
+    this.detailSummary,
+    this.responsibilities,
+    this.achievements,
+    this.relatedProjects,
   });
 }

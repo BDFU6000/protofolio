@@ -27,6 +27,54 @@ class ProjectModel {
   /// Optional: Path to the project's logo image.
   final String? imageUrl;
 
+  /// Optional summary text used in the project hero / detail view.
+  final String? subtitle;
+
+  /// Category such as "Concept", "Corporate Website", "SaaS".
+  final String? category;
+
+  /// Personal role in the project.
+  final String? role;
+
+  /// Public status, such as "Independent Redesign Concept" or "Deployed".
+  final String? status;
+
+  /// A fuller overview section for case-study pages.
+  final String? overview;
+
+  /// What problem or opportunity motivated the project.
+  final String? challenge;
+
+  /// Primary goals to achieve.
+  final List<String>? objectives;
+
+  /// How the solution was approached.
+  final String? approach;
+
+  /// UI/UX rationale and design decisions.
+  final String? designAndUx;
+
+  /// Development and implementation notes.
+  final String? development;
+
+  /// Exposed feature list for the project.
+  final List<String>? keyFeatures;
+
+  /// Structured technical stack with role labels.
+  final List<ProjectTechStackItem>? techStack;
+
+  /// Personal responsibilities and accomplishment areas.
+  final List<String>? responsibilities;
+
+  /// Technical and design challenges with their solutions.
+  final List<ProjectChallengeSolution>? challenges;
+
+  /// Gallery images used in the project detail screen.
+  final List<ProjectGalleryItem>? gallery;
+
+  /// Related project names or keywords for navigation.
+  final List<String>? relatedProjects;
+
   /// Optional: Detailed step-by-step sections for the project page.
   final List<ProjectDetailSection>? detailedSections;
 
@@ -39,7 +87,55 @@ class ProjectModel {
     this.liveUrl,
     this.githubUrl,
     this.imageUrl,
+    this.subtitle,
+    this.category,
+    this.role,
+    this.status,
+    this.overview,
+    this.challenge,
+    this.objectives,
+    this.approach,
+    this.designAndUx,
+    this.development,
+    this.keyFeatures,
+    this.techStack,
+    this.responsibilities,
+    this.challenges,
+    this.gallery,
+    this.relatedProjects,
     this.detailedSections,
+  });
+}
+
+class ProjectTechStackItem {
+  final String name;
+  final String role;
+
+  const ProjectTechStackItem({
+    required this.name,
+    required this.role,
+  });
+}
+
+class ProjectChallengeSolution {
+  final String challenge;
+  final String solution;
+
+  const ProjectChallengeSolution({
+    required this.challenge,
+    required this.solution,
+  });
+}
+
+class ProjectGalleryItem {
+  final String title;
+  final String imageUrl;
+  final String? caption;
+
+  const ProjectGalleryItem({
+    required this.title,
+    required this.imageUrl,
+    this.caption,
   });
 }
 

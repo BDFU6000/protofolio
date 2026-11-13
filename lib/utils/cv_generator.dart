@@ -32,7 +32,7 @@ class CVGenerator {
 
     pw.MemoryImage? photo;
     try {
-      photo = pw.MemoryImage((await rootBundle.load('assets/images/Moneeb.jpg'))
+      photo = pw.MemoryImage((await rootBundle.load('assets/images/Moneeb.png'))
           .buffer
           .asUint8List());
     } catch (_) {}

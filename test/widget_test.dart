@@ -7,15 +7,21 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:my_protofolio/main.dart';
 
 void main() {
   testWidgets('App loads smoke test', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 800);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     // Build our app and trigger a frame.
     await tester.pumpWidget(const MyPortfolioApp());
+    await tester.pump(const Duration(seconds: 2));
 
     // Verify that the app loaded correctly.
     expect(find.byType(MaterialApp), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

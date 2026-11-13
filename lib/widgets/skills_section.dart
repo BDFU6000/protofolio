@@ -16,16 +16,14 @@ class SkillsSection extends StatelessWidget {
       builder: (context, isArabic, _) {
         final width = MediaQuery.of(context).size.width;
         final crossAxisCount = width > 1200
-            ? 4
+            ? 6
             : width > 800
-                ? 3
+                ? 4
                 : width > 500
-                    ? 2
-                    : 1;
+                    ? 3
+                    : 2;
 
-        final double childAspectRatio = crossAxisCount == 1
-            ? (width > 400 ? 4.5 : 3.5)
-            : (crossAxisCount == 2 ? 2.0 : 1.6);
+        final double childAspectRatio = crossAxisCount >= 4 ? 1.35 : 1.5;
 
         final horizontalPadding = width > 600 ? 40.0 : 16.0;
         final verticalPadding = width > 600 ? 80.0 : 48.0;
@@ -38,8 +36,8 @@ class SkillsSection extends StatelessWidget {
             children: [
               FadeInDown(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 14, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
                     color: const Color(0xFF00D4FF).withOpacity(0.1),
                     border: Border.all(
@@ -47,7 +45,7 @@ class SkillsSection extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    isArabic ? 'المهارات البرمجية' : 'TECH STACK',
+                    isArabic ? 'الأدوات والتقنيات' : 'TOOLS & TECHNOLOGIES',
                     style: GoogleFonts.inter(
                         color: const Color(0xFF00D4FF),
                         fontSize: 12,
@@ -64,10 +62,8 @@ class SkillsSection extends StatelessWidget {
                     colors: [Colors.white, Color(0xFFB0B8D0)],
                   ).createShader(bounds),
                   child: Text(
-                    isArabic
-                        ? 'المهارات والتقنيات'
-                        : 'Skills & Technologies',
-                    textAlign: TextAlign.center,
+                    isArabic ? 'المهارات والتقنيات' : 'Tools & Technologies',
+                    textAlign: TextAlign.start,
                     style: GoogleFonts.poppins(
                         color: Colors.white,
                         fontSize: titleFontSize,
@@ -75,12 +71,11 @@ class SkillsSection extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 48),
+              const SizedBox(height: 28),
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                gridDelegate:
-                    SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: crossAxisCount,
                   crossAxisSpacing: 16,
                   mainAxisSpacing: 16,
@@ -89,13 +84,173 @@ class SkillsSection extends StatelessWidget {
                 itemCount: PortfolioData.skills.length,
                 itemBuilder: (context, index) => FadeInUp(
                   delay: Duration(milliseconds: index * 80),
-                  child: _SkillCard(skill: PortfolioData.skills[index]),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(18),
+                    onTap: () =>
+                        _showDetailSheet(context, PortfolioData.skills[index]),
+                    child: _SkillCard(skill: PortfolioData.skills[index]),
+                  ),
                 ),
               ),
             ],
           ),
         );
       },
+    );
+  }
+
+  void _showDetailSheet(BuildContext context, SkillModel skill) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: const Color(0xFF0D1321),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.68,
+        minChildSize: 0.5,
+        maxChildSize: 0.85,
+        builder: (_, scrollController) => SingleChildScrollView(
+          controller: scrollController,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 48,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Text(skill.emoji, style: const TextStyle(fontSize: 28)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      skill.name,
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 18),
+              if (skill.category != null)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.03),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withOpacity(0.08)),
+                  ),
+                  child: Text(
+                    skill.category!,
+                    style: GoogleFonts.inter(
+                      color: const Color(0xFF00D4FF),
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 16),
+              Text(
+                skill.description ??
+                    'This skill was used across product design, implementation, problem-solving, and system integration in real portfolio work.',
+                style: GoogleFonts.inter(
+                  color: Colors.white70,
+                  height: 1.7,
+                ),
+              ),
+              if (skill.applications != null &&
+                  skill.applications!.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                Text(
+                  'Applied in',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                ...skill.applications!.map(
+                  (item) => Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 8, right: 8),
+                          child: Icon(Icons.circle,
+                              size: 8, color: Color(0xFF00D4FF)),
+                        ),
+                        Expanded(
+                          child: Text(
+                            item,
+                            style: GoogleFonts.inter(
+                              color: Colors.white70,
+                              height: 1.6,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              if (skill.relatedProjects != null &&
+                  skill.relatedProjects!.isNotEmpty) ...[
+                const SizedBox(height: 20),
+                Text(
+                  'Related projects',
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: skill.relatedProjects!
+                      .map(
+                        (item) => Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.03),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                                color: Colors.white.withOpacity(0.08)),
+                          ),
+                          child: Text(
+                            item,
+                            style: GoogleFonts.inter(
+                              color: Colors.white70,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -145,50 +300,40 @@ class _SkillCardState extends State<_SkillCard>
       onExit: (_) => setState(() => _hovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: _hovered
               ? _accentColor.withOpacity(0.08)
-              : Colors.white.withOpacity(0.03),
+              : const Color(0xFF0A4A50).withOpacity(0.72),
           border: Border.all(
-            color: _hovered
-                ? _accentColor.withOpacity(0.5)
-                : Colors.white.withOpacity(0.08),
+            color: _hovered ? const Color(0xFFFFC900) : const Color(0xFF167C82),
           ),
           borderRadius: BorderRadius.circular(18),
           boxShadow: _hovered
-              ? [BoxShadow(color: _accentColor.withOpacity(0.2), blurRadius: 20)]
+              ? [
+                  BoxShadow(
+                      color: _accentColor.withOpacity(0.2), blurRadius: 20)
+                ]
               : [],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                Text(widget.skill.emoji,
-                    style: const TextStyle(fontSize: 26)),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Text(
-                    widget.skill.name,
-                    style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                Text(
-                  '${(widget.skill.level * 100).toInt()}%',
-                  style: GoogleFonts.inter(
-                      color: _accentColor,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w700),
-                ),
-              ],
+            Text(widget.skill.emoji, style: const TextStyle(fontSize: 28)),
+            const SizedBox(height: 8),
+            Text(
+              widget.skill.name,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             AnimatedBuilder(
               animation: _progressAnimation,
               builder: (_, __) => ClipRRect(
@@ -196,9 +341,8 @@ class _SkillCardState extends State<_SkillCard>
                 child: LinearProgressIndicator(
                   value: _progressAnimation.value,
                   backgroundColor: Colors.white.withOpacity(0.06),
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(_accentColor),
-                  minHeight: 5,
+                  valueColor: AlwaysStoppedAnimation<Color>(_accentColor),
+                  minHeight: 3,
                 ),
               ),
             ),

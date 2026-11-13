@@ -9,7 +9,7 @@ import 'widgets/experience_section.dart';
 import 'widgets/hero_section.dart';
 import 'widgets/nav_bar.dart';
 import 'widgets/projects_section.dart';
-import 'widgets/skills_section.dart';
+import 'widgets/services_section.dart';
 
 class PortfolioScreen extends StatefulWidget {
   const PortfolioScreen({super.key});
@@ -36,7 +36,6 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
   void _onScroll() {
     // Determine which section is currently visible
-    final scrollOffset = _scrollController.offset;
     final viewPortHeight = _scrollController.position.viewportDimension;
 
     // A simple heuristic: check which section's top is nearest to the middle of the screen.
@@ -87,9 +86,13 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final horizontalInset =
+        screenWidth > 1200 ? 36.0 : (screenWidth > 700 ? 28.0 : 16.0);
+
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color(0xFF0A0F1E), // Deep navy/slate
+      backgroundColor: const Color(0xFF032D32),
       endDrawer: ValueListenableBuilder<bool>(
         valueListenable: LocaleProvider.isArabic,
         builder: (context, isArabic, _) {
@@ -280,53 +283,86 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       ),
       body: Stack(
         children: [
+          const Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF022B30),
+                    Color(0xFF03464B),
+                    Color(0xFF022E35),
+                  ],
+                  stops: [0, 0.58, 1],
+                ),
+              ),
+            ),
+          ),
+          const Positioned(
+            top: -110,
+            left: -150,
+            child: _GlowOrb(size: 300),
+          ),
+          const Positioned(
+            top: 480,
+            right: -210,
+            child: _GlowOrb(size: 360),
+          ),
           // Main content scrollable
           SingleChildScrollView(
             controller: _scrollController,
             child: Column(
               children: [
-                // 0: Home / Hero
                 Container(
                   key: _sectionKeys[0],
-                  child: const HeroSection(),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 1280),
+                      child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: horizontalInset),
+                        child: HeroReferenceSection(
+                          toolsKey: _sectionKeys[1],
+                          onViewWork: () => _scrollToSection(2),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-
-                // Content wrapper for max width (desktop)
+                // Projects section gets full width so 3D carousel cards are not clipped
+                Container(
+                  key: _sectionKeys[2],
+                  child: const ProjectsSection(),
+                ),
                 Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 1200),
-                    child: Column(
-                      children: [
-                        // 1: About
-                        Container(
-                          key: _sectionKeys[1],
-                          child: const AboutSection(),
-                        ),
-
-                        // 2: Skills
-                        Container(
-                          key: _sectionKeys[2],
-                          child: const SkillsSection(),
-                        ),
-
-                        // 3: Experience
-                        Container(
-                          key: _sectionKeys[3],
-                          child: const ExperienceSection(),
-                        ),
-
-                        // 4: Projects
-                        Container(
-                          key: _sectionKeys[4],
-                          child: const ProjectsSection(),
-                        ),
-
-                        // 5: Contact
-                        Container(
-                          key: _sectionKeys[5],
-                          child: const ContactSection(),
-                        ),
-                      ],
+                    constraints: const BoxConstraints(maxWidth: 1280),
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: horizontalInset),
+                      child: Column(
+                        children: [
+                          Container(
+                            key: _sectionKeys[3],
+                            child: AboutSection(
+                              onContactTap: () => _scrollToSection(6),
+                            ),
+                          ),
+                          Container(
+                            key: _sectionKeys[4],
+                            child: const ExperienceSection(),
+                          ),
+                          Container(
+                            key: _sectionKeys[5],
+                            child: const ServicesSection(),
+                          ),
+                          Container(
+                            key: _sectionKeys[6],
+                            child: const ContactSection(),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -351,4 +387,22 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       ),
     );
   }
+}
+
+class _GlowOrb extends StatelessWidget {
+  const _GlowOrb({required this.size});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: size,
+        height: size,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(
+            colors: [Color(0xFFFFC900), Color(0x00FFC900)],
+          ),
+        ),
+      );
 }

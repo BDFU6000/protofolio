@@ -1,6 +1,4 @@
-import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -11,728 +9,319 @@ class ContactSection extends StatelessWidget {
   const ContactSection({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ValueListenableBuilder<bool>(
-      valueListenable: LocaleProvider.isArabic,
-      builder: (context, isArabic, _) {
-        final width = MediaQuery.of(context).size.width;
-        final horizontalPadding = width > 600 ? 40.0 : 16.0;
-        final topPadding = width > 600 ? 100.0 : 64.0;
-        final bottomPadding = width > 600 ? 40.0 : 32.0;
-        final titleFontSize = width > 600 ? 48.0 : 32.0;
-        final bodyFontSize = width > 600 ? 16.0 : 14.0;
-
-        return Container(
-          padding: EdgeInsets.fromLTRB(
-              horizontalPadding, topPadding, horizontalPadding, bottomPadding),
+  Widget build(BuildContext context) => ValueListenableBuilder<bool>(
+        valueListenable: LocaleProvider.isArabic,
+        builder: (context, isArabic, _) => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 58),
           child: Column(
-            children: [
-              FadeInUp(
-                child: Text(
-                  isArabic ? 'ما هي الخطوة القادمة؟' : "What's Next?",
-                  style: GoogleFonts.inter(
-                    color: const Color(0xFF00D4FF),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 2,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              FadeInUp(
-                delay: const Duration(milliseconds: 100),
-                child: ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
-                    colors: [Colors.white, Color(0xFFB0B8D0)],
-                  ).createShader(bounds),
-                  child: Text(
-                    isArabic ? 'تواصل معي' : 'Get In Touch',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: titleFontSize,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              FadeInUp(
-                delay: const Duration(milliseconds: 200),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 600),
-                  child: Text(
-                    isArabic
-                        ? 'رغم أنني لا أبحث عن فرص جديدة حالياً، إلا أن بريدي الوارد مفتوح دائماً. سواء كان لديك سؤال أو ترغب فقط في إلقاء التحية، سأبذل قصارى جهدي للرد عليك!'
-                        : "Although I'm not currently looking for any new opportunities, "
-                            "my inbox is always open. Whether you have a question or just "
-                            "want to say hi, I'll try my best to get back to you!",
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      color: Colors.white54,
-                      fontSize: bodyFontSize,
-                      height: 1.6,
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 48),
-              // Contact Cards Grid
-              FadeInUp(
-                delay: const Duration(milliseconds: 300),
-                child: _ContactCardsGrid(isArabic: isArabic),
-              ),
-              const SizedBox(height: 48),
-              FadeInUp(
-                delay: const Duration(milliseconds: 450),
-                child: _SayHelloButton(isArabic: isArabic),
-              ),
-              const SizedBox(height: 80),
-              _Footer(isArabic: isArabic),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
-
-// ── Contact Cards Grid ────────────────────────────────────────────────────────
-
-class _ContactCardsGrid extends StatelessWidget {
-  const _ContactCardsGrid({required this.isArabic});
-  final bool isArabic;
-
-  @override
-  Widget build(BuildContext context) {
-    final cards = [
-      _ContactCardData(
-        icon: Icons.email_rounded,
-        label: isArabic ? 'البريد الإلكتروني' : 'Email',
-        value: PortfolioData.email,
-        color: const Color(0xFFEA4335),
-        url: 'mailto:${PortfolioData.email}',
-        canCopy: true,
-      ),
-      _ContactCardData(
-        icon: Icons.chat_rounded,
-        label: 'WhatsApp',
-        value: PortfolioData.whatsapp,
-        color: const Color(0xFF25D366),
-        url: 'https://wa.me/${PortfolioData.whatsapp.replaceAll('+', '')}',
-        canCopy: true,
-      ),
-      _ContactCardData(
-        icon: Icons.camera_alt_rounded,
-        label: 'Instagram',
-        value: PortfolioData.instagram,
-        color: const Color(0xFFE1306C),
-        url: 'https://instagram.com/${PortfolioData.instagram.replaceAll('@', '')}',
-        canCopy: false,
-      ),
-      _ContactCardData(
-        icon: Icons.code_rounded,
-        label: 'GitHub',
-        value: 'BDFU6000',
-        color: const Color(0xFF6E5494),
-        url: PortfolioData.githubUrl,
-        canCopy: false,
-      ),
-    ];
-
-    return LayoutBuilder(builder: (context, constraints) {
-      final crossCount = constraints.maxWidth > 768
-          ? 4
-          : (constraints.maxWidth > 400 ? 2 : 1);
-      final aspect = constraints.maxWidth > 768
-          ? 1.3
-          : (constraints.maxWidth > 400 ? 1.15 : 2.8);
-
-      return GridView.count(
-        crossAxisCount: crossCount,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: aspect,
-        children: cards.map((c) => _ContactCard(data: c, isArabic: isArabic)).toList(),
-      );
-    });
-  }
-}
-
-class _ContactCardData {
-  const _ContactCardData({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.color,
-    required this.url,
-    required this.canCopy,
-  });
-  final IconData icon;
-  final String label, value, url;
-  final Color color;
-  final bool canCopy;
-}
-
-class _ContactCard extends StatefulWidget {
-  const _ContactCard({required this.data, required this.isArabic});
-  final _ContactCardData data;
-  final bool isArabic;
-
-  @override
-  State<_ContactCard> createState() => _ContactCardState();
-}
-
-class _ContactCardState extends State<_ContactCard> {
-  bool _hovered = false;
-
-  Future<void> _launch() async {
-    final uri = Uri.parse(widget.data.url);
-    if (await canLaunchUrl(uri)) await launchUrl(uri);
-  }
-
-  void _copy(BuildContext context) {
-    Clipboard.setData(ClipboardData(text: widget.data.value));
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(
-        widget.isArabic ? 'تم النسخ!' : 'Copied!',
-        style: GoogleFonts.inter(color: Colors.white),
-      ),
-      backgroundColor: const Color(0xFF131A2A),
-      duration: const Duration(seconds: 2),
-    ));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final cardPadding = width > 500 ? 20.0 : 14.0;
-
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: _launch,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          transform: Matrix4.translationValues(0, _hovered ? -4 : 0, 0),
-          padding: EdgeInsets.all(cardPadding),
-          decoration: BoxDecoration(
-            color: _hovered
-                ? widget.data.color.withOpacity(0.12)
-                : Colors.white.withOpacity(0.03),
-            border: Border.all(
-              color: _hovered
-                ? widget.data.color.withOpacity(0.6)
-                : Colors.white.withOpacity(0.08),
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: _hovered
-                ? [
-                    BoxShadow(
-                      color: widget.data.color.withOpacity(0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8),
-                    )
-                  ]
-                : [],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: widget.data.color.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(widget.data.icon,
-                        color: widget.data.color, size: 18),
-                  ),
-                  if (widget.data.canCopy)
-                    GestureDetector(
-                      onTap: () => _copy(context),
-                      behavior: HitTestBehavior.opaque,
-                      child: const Icon(Icons.copy_rounded,
-                          color: Colors.white24, size: 16),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 10),
+              _ContactSectionLabel(text: isArabic ? 'تواصل معي' : 'CONTACT ME'),
+              const SizedBox(height: 18),
               Text(
-                widget.data.label,
-                style: GoogleFonts.inter(
-                  color: Colors.white38,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w500,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                widget.data.value,
-                style: GoogleFonts.inter(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Say Hello button → opens full contact dialog ──────────────────────────────
-
-class _SayHelloButton extends StatefulWidget {
-  const _SayHelloButton({required this.isArabic});
-  final bool isArabic;
-
-  @override
-  State<_SayHelloButton> createState() => _SayHelloButtonState();
-}
-
-class _SayHelloButtonState extends State<_SayHelloButton> {
-  bool _hovered = false;
-
-  void _showContactDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierColor: Colors.black87,
-      builder: (_) => _ContactDialog(isArabic: widget.isArabic),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () => _showContactDialog(context),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 18),
-          decoration: BoxDecoration(
-            gradient: _hovered
-                ? const LinearGradient(
-                    colors: [Color(0xFF00D4FF), Color(0xFF7B2FFF)],
-                  )
-                : null,
-            color: _hovered ? null : Colors.transparent,
-            border: Border.all(
-              color: _hovered
-                  ? Colors.transparent
-                  : const Color(0xFF00D4FF).withOpacity(0.5),
-              width: 2,
-            ),
-            borderRadius: BorderRadius.circular(40),
-            boxShadow: _hovered
-                ? [
-                    const BoxShadow(
-                      color: Color(0x5500D4FF),
-                      blurRadius: 30,
-                      offset: Offset(0, 8),
-                    )
-                  ]
-                : [],
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.waving_hand_rounded,
-                color: _hovered ? Colors.white : const Color(0xFF00D4FF),
-                size: 18,
-              ),
-              const SizedBox(width: 10),
-              Text(
-                widget.isArabic ? 'ألقِ التحية' : 'Say Hello',
+                isArabic
+                    ? 'لنبنِ شيئاً مميزاً معاً.'
+                    : "Let's work together. Have an idea? Let's build it.",
                 style: GoogleFonts.poppins(
-                  color: _hovered ? Colors.white : const Color(0xFF00D4FF),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  fontSize: MediaQuery.sizeOf(context).width > 760 ? 34 : 26,
+                  fontWeight: FontWeight.w700,
+                  height: 1.2,
                 ),
               ),
+              const SizedBox(height: 28),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final details = _ContactDetails(isArabic: isArabic);
+                  final form = _PortfolioContactForm(isArabic: isArabic);
+                  if (constraints.maxWidth > 760) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(flex: 4, child: details),
+                        const SizedBox(width: 26),
+                        Expanded(flex: 6, child: form),
+                      ],
+                    );
+                  }
+                  return Column(
+                    children: [details, const SizedBox(height: 22), form],
+                  );
+                },
+              ),
+              const SizedBox(height: 52),
+              const _ReferenceFooter(),
             ],
           ),
         ),
-      ),
-    );
-  }
+      );
 }
 
-// ── Contact Dialog ────────────────────────────────────────────────────────────
-
-class _ContactDialog extends StatelessWidget {
-  const _ContactDialog({required this.isArabic});
-  final bool isArabic;
+class _ContactSectionLabel extends StatelessWidget {
+  const _ContactSectionLabel({required this.text});
+  final String text;
 
   @override
-  Widget build(BuildContext context) {
-    final contacts = [
-      _DialogContact(
-        emoji: '📧',
-        platform: isArabic ? 'البريد الإلكتروني' : 'Email',
-        handle: PortfolioData.email,
-        color: const Color(0xFFEA4335),
-        url: 'mailto:${PortfolioData.email}',
-        canCopy: true,
-      ),
-      _DialogContact(
-        emoji: '💬',
-        platform: 'WhatsApp',
-        handle: PortfolioData.whatsapp,
-        color: const Color(0xFF25D366),
-        url:
-            'https://wa.me/${PortfolioData.whatsapp.replaceAll('+', '')}',
-        canCopy: true,
-      ),
-      _DialogContact(
-        emoji: '📸',
-        platform: 'Instagram',
-        handle: PortfolioData.instagram,
-        color: const Color(0xFFE1306C),
-        url: 'https://instagram.com/${PortfolioData.instagram.replaceAll('@', '')}',
-        canCopy: false,
-      ),
-      _DialogContact(
-        emoji: '🐙',
-        platform: 'GitHub',
-        handle: 'github.com/BDFU6000',
-        color: const Color(0xFF6E5494),
-        url: PortfolioData.githubUrl,
-        canCopy: false,
-      ),
-    ];
-
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: Container(
-            decoration: BoxDecoration(
-              color: const Color(0xFF0D1321),
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(
-                color: const Color(0xFF00D4FF).withOpacity(0.2),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF00D4FF).withOpacity(0.1),
-                  blurRadius: 60,
-                  spreadRadius: -10,
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Header
-                Container(
-                  padding: const EdgeInsets.all(28),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF00D4FF).withOpacity(0.08),
-                        const Color(0xFF7B2FFF).withOpacity(0.08),
-                      ],
-                    ),
-                    borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(28)),
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withOpacity(0.06),
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF00D4FF), Color(0xFF7B2FFF)],
-                          ),
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: const Center(
-                          child: Text('👋', style: TextStyle(fontSize: 24)),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isArabic ? 'تواصل معي' : "Let's Connect",
-                              style: GoogleFonts.poppins(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            Text(
-                              isArabic
-                                  ? 'اختر قناة التواصل المفضلة لديك'
-                                  : 'Choose your preferred channel',
-                              style: GoogleFonts.inter(
-                                color: Colors.white38,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close_rounded,
-                            color: Colors.white38, size: 20),
-                      ),
-                    ],
-                  ),
-                ),
-                // Contact list
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: contacts
-                        .map((c) => _DialogContactTile(
-                              contact: c,
-                              isArabic: isArabic,
-                            ))
-                        .toList(),
-                  ),
-                ),
-                // Footer
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-                  child: Text(
-                    isArabic
-                        ? 'عادةً ما أرد خلال ٢٤ ساعة ✨'
-                        : 'I usually respond within 24 hours ✨',
-                    style: GoogleFonts.inter(
-                        color: Colors.white24, fontSize: 12),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0B555B),
+          border: Border.all(color: const Color(0xFF178D93)),
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Text(
+          text,
+          style: GoogleFonts.inter(
+            color: const Color(0xFF69E4E6),
+            fontSize: 11,
+            letterSpacing: 1.1,
           ),
         ),
-      ),
-    );
-  }
+      );
 }
 
-class _DialogContact {
-  const _DialogContact({
-    required this.emoji,
-    required this.platform,
-    required this.handle,
-    required this.color,
-    required this.url,
-    required this.canCopy,
-  });
-  final String emoji, platform, handle, url;
-  final Color color;
-  final bool canCopy;
-}
-
-class _DialogContactTile extends StatefulWidget {
-  const _DialogContactTile(
-      {required this.contact, required this.isArabic});
-  final _DialogContact contact;
+class _ContactDetails extends StatelessWidget {
+  const _ContactDetails({required this.isArabic});
   final bool isArabic;
 
-  @override
-  State<_DialogContactTile> createState() => _DialogContactTileState();
-}
-
-class _DialogContactTileState extends State<_DialogContactTile> {
-  bool _hovered = false;
-
-  Future<void> _launch() async {
-    final uri = Uri.parse(widget.contact.url);
-    if (await canLaunchUrl(uri)) await launchUrl(uri);
-  }
-
-  void _copy() {
-    Clipboard.setData(ClipboardData(text: widget.contact.handle));
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(
-        widget.isArabic ? 'تم النسخ!' : 'Copied!',
-        style: GoogleFonts.inter(color: Colors.white),
-      ),
-      backgroundColor: const Color(0xFF131A2A),
-      duration: const Duration(seconds: 2),
-    ));
-  }
+  static const _entries = [
+    ('assets/images/Gmail_logo.png', 'Email', PortfolioData.email),
+    ('assets/images/whatsapp_logo.webp', 'WhatsApp', PortfolioData.whatsapp),
+    ('assets/images/Instagram_logo.png', 'Instagram', PortfolioData.instagram),
+    ('assets/images/Github_logo.png', 'GitHub', 'BDFU6000'),
+    ('assets/images/Linkedin_LOGO.png', 'LinkedIn', 'Moneeb Salah Abusetta'),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _hovered = true),
-        onExit: (_) => setState(() => _hovered = false),
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: _launch,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 180),
-            padding: const EdgeInsets.symmetric(
-                horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: _hovered
-                  ? widget.contact.color.withOpacity(0.1)
-                  : Colors.white.withOpacity(0.03),
-              border: Border.all(
-                color: _hovered
-                    ? widget.contact.color.withOpacity(0.5)
-                    : Colors.white.withOpacity(0.06),
-              ),
-              borderRadius: BorderRadius.circular(14),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          isArabic ? 'يسعدني أن أسمع منك.' : "Let's make your next idea real.",
+          style: GoogleFonts.inter(
+            color: Colors.white70,
+            fontSize: 15,
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 22),
+        for (final entry in _entries)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
             child: Row(
               children: [
-                Text(widget.contact.emoji,
-                    style: const TextStyle(fontSize: 22)),
-                const SizedBox(width: 14),
+                Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFC900).withValues(alpha: .1),
+                    borderRadius: BorderRadius.circular(9),
+                  ),
+                  padding: const EdgeInsets.all(6),
+                  child: Image.asset(
+                    entry.$1,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Icon(
+                      Icons.link_rounded,
+                      size: 17,
+                      color: Color(0xFFFFC900),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        widget.contact.platform,
+                        entry.$2,
                         style: GoogleFonts.inter(
-                            color: Colors.white38,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500),
+                          color: Colors.white54,
+                          fontSize: 10,
+                        ),
                       ),
-                      const SizedBox(height: 1),
                       Text(
-                        widget.contact.handle,
+                        entry.$3,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: GoogleFonts.inter(
                           color: Colors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                 ),
-                if (widget.contact.canCopy)
-                  GestureDetector(
-                    onTap: _copy,
-                    behavior: HitTestBehavior.opaque,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 8),
-                      child: Icon(Icons.copy_rounded,
-                          color: Colors.white24, size: 16),
-                    ),
-                  ),
-                const SizedBox(width: 8),
-                Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  color: _hovered
-                      ? widget.contact.color
-                      : Colors.white12,
-                  size: 14,
-                ),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Footer ────────────────────────────────────────────────────────────────────
-
-class _Footer extends StatelessWidget {
-  const _Footer({required this.isArabic});
-  final bool isArabic;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _FooterSocialIcon(
-                icon: Icons.code, url: PortfolioData.githubUrl),
-            const SizedBox(width: 20),
-            _FooterSocialIcon(
-                icon: Icons.chat_bubble_outline,
-                url:
-                    'https://wa.me/${PortfolioData.whatsapp.replaceAll('+', '')}'),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Text(
-          isArabic
-              ? 'صنع باستخدام فلاتر و 💙 بواسطة ${PortfolioData.name}'
-              : 'Built with Flutter & 💙 by ${PortfolioData.name}',
-          style: GoogleFonts.inter(color: Colors.white24, fontSize: 13),
-        ),
       ],
     );
   }
 }
 
-class _FooterSocialIcon extends StatefulWidget {
-  const _FooterSocialIcon({required this.icon, required this.url});
-  final IconData icon;
-  final String url;
+class _PortfolioContactForm extends StatefulWidget {
+  const _PortfolioContactForm({required this.isArabic});
+  final bool isArabic;
 
   @override
-  State<_FooterSocialIcon> createState() => _FooterSocialIconState();
+  State<_PortfolioContactForm> createState() => _PortfolioContactFormState();
 }
 
-class _FooterSocialIconState extends State<_FooterSocialIcon> {
-  bool _hovered = false;
+class _PortfolioContactFormState extends State<_PortfolioContactForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _messageController = TextEditingController();
 
-  Future<void> _launch() async {
-    final uri = Uri.parse(widget.url);
-    if (await canLaunchUrl(uri)) await launchUrl(uri);
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _sendMessage() async {
+    if (!_formKey.currentState!.validate()) return;
+    final subject = Uri.encodeComponent(
+        'Portfolio inquiry from ${_nameController.text.trim()}');
+    final body = Uri.encodeComponent(
+      'Name: ${_nameController.text.trim()}\nEmail: ${_emailController.text.trim()}\n\n${_messageController.text.trim()}',
+    );
+    final uri =
+        Uri.parse('mailto:${PortfolioData.email}?subject=$subject&body=$body');
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(widget.isArabic
+              ? 'تعذر فتح تطبيق البريد.'
+              : 'Could not open an email app.'),
+        ),
+      );
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: _launch,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.all(12),
-          child: Icon(
-            widget.icon,
-            color: _hovered ? const Color(0xFF00D4FF) : Colors.white38,
-            size: 24,
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0A4A50).withValues(alpha: .8),
+          border: Border.all(color: const Color(0xFF167C82)),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.isArabic ? 'أخبرني عن فكرتك' : 'Tell me about your idea',
+                style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _MessageField(
+                controller: _nameController,
+                label: widget.isArabic ? 'الاسم' : 'Your name',
+              ),
+              const SizedBox(height: 12),
+              _MessageField(
+                controller: _emailController,
+                label: widget.isArabic ? 'البريد الإلكتروني' : 'Your email',
+                isEmail: true,
+              ),
+              const SizedBox(height: 12),
+              _MessageField(
+                controller: _messageController,
+                label: widget.isArabic ? 'رسالتك' : 'Your message',
+                maxLines: 4,
+              ),
+              const SizedBox(height: 16),
+              Align(
+                alignment: AlignmentDirectional.centerEnd,
+                child: FilledButton.icon(
+                  onPressed: _sendMessage,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFFFFC900),
+                    foregroundColor: const Color(0xFF12383A),
+                  ),
+                  icon: const Icon(Icons.send_rounded, size: 16),
+                  label: Text(widget.isArabic ? 'إرسال' : 'Send message'),
+                ),
+              ),
+            ],
           ),
         ),
-      ),
-    );
-  }
+      );
+}
+
+class _MessageField extends StatelessWidget {
+  const _MessageField({
+    required this.controller,
+    required this.label,
+    this.isEmail = false,
+    this.maxLines = 1,
+  });
+  final TextEditingController controller;
+  final String label;
+  final bool isEmail;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) => TextFormField(
+        controller: controller,
+        maxLines: maxLines,
+        keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
+        style: GoogleFonts.inter(color: Colors.white, fontSize: 13),
+        decoration: InputDecoration(
+          labelText: label,
+          labelStyle: GoogleFonts.inter(color: Colors.white60, fontSize: 12),
+          filled: true,
+          fillColor: Colors.white.withValues(alpha: .08),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(9),
+            borderSide: BorderSide.none,
+          ),
+          errorStyle: const TextStyle(color: Color(0xFFFFB4AB)),
+        ),
+        validator: (value) {
+          final text = value?.trim() ?? '';
+          if (text.isEmpty) return 'Required';
+          if (isEmail && !RegExp(r'^.+@.+\..+$').hasMatch(text)) {
+            return 'Enter a valid email';
+          }
+          return null;
+        },
+      );
+}
+
+class _ReferenceFooter extends StatelessWidget {
+  const _ReferenceFooter();
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 28),
+        decoration: BoxDecoration(
+          color: const Color(0xFFFFC900),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Text(
+          '© ${DateTime.now().year} ${PortfolioData.name} · Built with Flutter',
+          textAlign: TextAlign.center,
+          style: GoogleFonts.inter(
+            color: const Color(0xFF17383A),
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
 }
