@@ -30,15 +30,10 @@ class AboutSection extends StatelessWidget {
             .split('\n\n');
 
         return Padding(
-          padding: EdgeInsets.fromLTRB(20, isWide ? 50 : 34, 20, 54),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1120),
-              child: isWide
-                  ? _desktopLayout(context, paragraphs, isArabic)
-                  : _mobileLayout(context, paragraphs, isArabic),
-            ),
-          ),
+          padding: EdgeInsets.fromLTRB(0, isWide ? 50 : 34, 0, 54),
+          child: isWide
+              ? _desktopLayout(context, paragraphs, isArabic)
+              : _mobileLayout(context, paragraphs, isArabic),
         );
       },
     );
@@ -132,39 +127,47 @@ class _AboutContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Pill — same style as _SectionPill in projects_section and _RoadmapPill in experience_section
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-          decoration: BoxDecoration(
-            color: const Color(0xFF073F45),
-            border: Border.all(color: const Color(0xFF16818A)),
-            borderRadius: BorderRadius.circular(5),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+        Padding(
+          padding: EdgeInsets.only(left: compact ? 0 : 90),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.circle, size: 9, color: Color(0xFF69E4E6)),
-              const SizedBox(width: 6),
-              Text(
-                isArabic ? '٠١ — نبذة عني' : 'About Me.',
-                style: GoogleFonts.inter(
-                  color: const Color(0xFF69E4E6),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
+              // Pill
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF073F45),
+                  border: Border.all(color: const Color(0xFF16818A)),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.circle, size: 9, color: Color(0xFF69E4E6)),
+                    const SizedBox(width: 6),
+                    Text(
+                      isArabic ? '٠١ — نبذة عني' : 'About Me.',
+                      style: GoogleFonts.inter(
+                        color: const Color(0xFF69E4E6),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: compact ? 18 : 20),
+              _AboutHeadline(isArabic: isArabic, compact: compact),
+              const SizedBox(height: 13),
+              Container(
+                width: 140,
+                height: 3,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(colors: [_cyan, _gold]),
+                  borderRadius: BorderRadius.all(Radius.circular(3)),
                 ),
               ),
             ],
-          ),
-        ),
-        SizedBox(height: compact ? 18 : 20),
-        _AboutHeadline(isArabic: isArabic, compact: compact),
-        const SizedBox(height: 13),
-        Container(
-          width: 140,
-          height: 3,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [_cyan, _gold]),
-            borderRadius: BorderRadius.all(Radius.circular(3)),
           ),
         ),
         SizedBox(height: compact ? 20 : 22),

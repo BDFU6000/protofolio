@@ -5,7 +5,6 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/locale_provider.dart';
 
-const _bg = Color(0xFF032D32);
 const _aqua = Color(0xFF52D8DE);
 const _gold = Color(0xFFFFC900);
 const _surface = Color(0xFF062F35);
@@ -104,16 +103,14 @@ class ServicesSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.sizeOf(context).width;
     final isWide = width > 860;
-    final hPad = width > 1200 ? 74.0 : width > 700 ? 40.0 : 20.0;
 
     return ValueListenableBuilder<bool>(
       valueListenable: LocaleProvider.isArabic,
       builder: (context, isArabic, _) {
         final services = isArabic ? _ar : _en;
 
-        return Container(
+        return SizedBox(
           width: double.infinity,
-          color: _bg,
           child: Stack(
             children: [
               Positioned.fill(
@@ -122,11 +119,14 @@ class ServicesSection extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(hPad, 80, hPad, 90),
+                padding: EdgeInsets.fromLTRB(0, 80, 0, 90),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _SectionHeader(isArabic: isArabic, isWide: isWide),
+                    Padding(
+                      padding: EdgeInsets.only(left: isWide ? 90 : 0),
+                      child: _SectionHeader(isArabic: isArabic, isWide: isWide),
+                    ),
                     SizedBox(height: isWide ? 64 : 44),
                     for (var i = 0; i < services.length; i++) ...[
                       if (i > 0)
@@ -282,8 +282,8 @@ class _ServiceRowState extends State<_ServiceRow> {
       return _MobileCard(service: s, isArabic: widget.isArabic);
     }
 
-    final content = _RowContent(
-        service: s, hovered: _hovered, isArabic: widget.isArabic);
+    final content =
+        _RowContent(service: s, hovered: _hovered, isArabic: widget.isArabic);
     final image = _RowImage(service: s, hovered: _hovered);
 
     return MouseRegion(
@@ -297,8 +297,7 @@ class _ServiceRowState extends State<_ServiceRow> {
         decoration: BoxDecoration(
           color: _hovered ? _gold.withValues(alpha: .04) : Colors.transparent,
           border: Border.all(
-            color:
-                _hovered ? _gold.withValues(alpha: .25) : Colors.transparent,
+            color: _hovered ? _gold.withValues(alpha: .25) : Colors.transparent,
           ),
           borderRadius: BorderRadius.circular(24),
         ),
@@ -444,8 +443,8 @@ class _RowImage extends StatelessWidget {
           fit: BoxFit.contain,
           errorBuilder: (_, __, ___) => Padding(
             padding: const EdgeInsets.all(48),
-            child:
-                Icon(service.icon, color: _aqua.withValues(alpha: .3), size: 56),
+            child: Icon(service.icon,
+                color: _aqua.withValues(alpha: .3), size: 56),
           ),
         ),
       ),
@@ -527,8 +526,7 @@ class _MobileCard extends StatelessWidget {
                       width: 60,
                       height: 2,
                       decoration: BoxDecoration(
-                        gradient:
-                            const LinearGradient(colors: [_aqua, _gold]),
+                        gradient: const LinearGradient(colors: [_aqua, _gold]),
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),

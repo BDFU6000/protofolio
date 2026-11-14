@@ -379,7 +379,7 @@ class ExperienceSection extends StatelessWidget {
           final wide = MediaQuery.sizeOf(context).width > 760;
           return Padding(
             padding: EdgeInsets.symmetric(
-              horizontal: wide ? 20 : 16,
+              horizontal: 0,
               vertical: wide ? 58 : 40,
             ),
             child: Column(
@@ -822,7 +822,9 @@ class _RoadmapIntro extends StatelessWidget {
   static const _gold = Color(0xFFFFC900);
 
   @override
-  Widget build(BuildContext context) => Column(
+  Widget build(BuildContext context) => Padding(
+        padding: EdgeInsets.only(left: wide ? 90 : 0),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _RoadmapPill(isArabic: isArabic),
@@ -878,6 +880,7 @@ class _RoadmapIntro extends StatelessWidget {
             ),
           ),
         ],
+      ),
       );
 }
 

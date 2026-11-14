@@ -82,8 +82,6 @@ class HeroReferenceSection extends StatelessWidget {
 class _HeroBackdropPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-        Offset.zero & size, Paint()..color = const Color(0xFF032D32));
     final goldPaint = Paint()..color = const Color(0xFFFFC900);
     canvas.drawCircle(Offset(-size.width * .06, -size.height * .10),
         size.width * .19, goldPaint);
@@ -264,7 +262,7 @@ class _HeroButton extends StatelessWidget {
             : const BorderSide(color: Color(0xFF62DADD)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-        shadowColor: Colors.transparent,
+        shadowColor: Color(0xFF62DADD).withOpacity(0.25),
       ),
       child: Text(
         label,

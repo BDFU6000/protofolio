@@ -29,7 +29,7 @@ class MyPortfolioApp extends StatelessWidget {
           return Directionality(
             textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
             child: MaterialApp(
-              title: 'Abd Almoneeb Abusetta | Portfolio',
+              title: 'Eng:AbdAlmoneeb Abusetta | Portfolio',
               debugShowCheckedModeBanner: false,
               themeMode: themeMode,
               theme: ThemeData(

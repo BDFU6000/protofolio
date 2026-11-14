@@ -29,45 +29,65 @@ class SkillsSection extends StatelessWidget {
         final verticalPadding = width > 600 ? 80.0 : 48.0;
         final titleFontSize = width > 600 ? 36.0 : 26.0;
 
-        return Container(
+        return Padding(
           padding: EdgeInsets.symmetric(
               horizontal: horizontalPadding, vertical: verticalPadding),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               FadeInDown(
                 child: Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00D4FF).withOpacity(0.1),
-                    border: Border.all(
-                        color: const Color(0xFF00D4FF).withOpacity(0.4)),
-                    borderRadius: BorderRadius.circular(20),
+                    color: const Color(0xFF073F45),
+                    border: Border.all(color: const Color(0xFF16818A)),
+                    borderRadius: BorderRadius.circular(5),
                   ),
-                  child: Text(
-                    isArabic ? 'الأدوات والتقنيات' : 'TOOLS & TECHNOLOGIES',
-                    style: GoogleFonts.inter(
-                        color: const Color(0xFF00D4FF),
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.circle,
+                          size: 9, color: Color(0xFF69E4E6)),
+                      const SizedBox(width: 6),
+                      Text(
+                        isArabic ? 'الأدوات والتقنيات' : 'Tools & Technologies.',
+                        style: GoogleFonts.inter(
+                          color: const Color(0xFF69E4E6),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 22),
               FadeInDown(
                 delay: const Duration(milliseconds: 100),
-                child: ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
-                    colors: [Colors.white, Color(0xFFB0B8D0)],
-                  ).createShader(bounds),
-                  child: Text(
-                    isArabic ? 'المهارات والتقنيات' : 'Tools & Technologies',
-                    textAlign: TextAlign.start,
-                    style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontSize: titleFontSize,
-                        fontWeight: FontWeight.w700),
+                child: Text.rich(
+                  TextSpan(
+                    style: GoogleFonts.orbitron(
+                      color: Colors.white,
+                      fontSize: titleFontSize,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: titleFontSize > 30 ? 5 : 2,
+                      height: 1.25,
+                      shadows: const [
+                        Shadow(
+                          color: Color(0xAA00D4FF),
+                          offset: Offset(2, 2),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
+                    children: [
+                      TextSpan(text: isArabic ? 'مهاراتي ' : 'My '),
+                      TextSpan(
+                        text: isArabic ? 'وتقنياتي.' : 'Tech Stack.',
+                        style: const TextStyle(color: Color(0xFF52D8DE)),
+                      ),
+                    ],
                   ),
                 ),
               ),

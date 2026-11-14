@@ -1,3 +1,5 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,81 +10,134 @@ import '../utils/locale_provider.dart';
 class ContactSection extends StatelessWidget {
   const ContactSection({super.key});
 
+  static const _aqua = Color(0xFF52D8DE);
+
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<bool>(
         valueListenable: LocaleProvider.isArabic,
-        builder: (context, isArabic, _) => Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 58),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _ContactSectionLabel(text: isArabic ? 'تواصل معي' : 'CONTACT ME'),
-              const SizedBox(height: 18),
-              Text(
-                isArabic
-                    ? 'لنبنِ شيئاً مميزاً معاً.'
-                    : "Let's work together. Have an idea? Let's build it.",
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: MediaQuery.sizeOf(context).width > 760 ? 34 : 26,
-                  fontWeight: FontWeight.w700,
-                  height: 1.2,
+        builder: (context, isArabic, _) {
+          final isWide = MediaQuery.sizeOf(context).width > 760;
+          return Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 0,
+              vertical: isWide ? 64 : 44,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+              Padding(
+                padding: EdgeInsets.only(left: isWide ? 90 : 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                // Section pill
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF073F45),
+                    border: Border.all(color: const Color(0xFF16818A)),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.circle, size: 9, color: _aqua),
+                      const SizedBox(width: 6),
+                      Text(
+                        isArabic ? 'تواصل معي' : 'Contact me.',
+                        style: GoogleFonts.inter(
+                          color: _aqua,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 22),
+                // Heading
+                Text.rich(
+                  TextSpan(
+                    style: GoogleFonts.orbitron(
+                      color: Colors.white,
+                      fontSize: isWide ? 34 : 24,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: isWide ? 5 : 2,
+                      height: 1.25,
+                      shadows: const [
+                        Shadow(
+                          color: Color(0xAA00D4FF),
+                          offset: Offset(2, 2),
+                          blurRadius: 2,
+                        ),
+                      ],
+                    ),
+                    children: [
+                      TextSpan(text: isArabic ? 'لنبنِ ' : "Let's "),
+                      TextSpan(
+                        text: isArabic ? 'شيئاً مميزاً.' : 'Build Together.',
+                        style: const TextStyle(color: _aqua),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  isArabic
+                      ? 'لديك فكرة؟ تواصل معي وسنحولها إلى واقع.'
+                      : 'Have an idea? Reach out and let\'s make it real.',
+                  style: GoogleFonts.orbitron(
+                    color: Colors.white,
+                    fontSize: isWide ? 13 : 10,
+                    letterSpacing: isWide ? 3 : 1,
+                    height: 1.6,
+                    shadows: const [
+                      Shadow(
+                        color: Color(0xAA00D4FF),
+                        offset: Offset(1, 2),
+                        blurRadius: 2,
+                      ),
+                    ],
+                  ),
+                ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 28),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final details = _ContactDetails(isArabic: isArabic);
-                  final form = _PortfolioContactForm(isArabic: isArabic);
-                  if (constraints.maxWidth > 760) {
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(flex: 4, child: details),
-                        const SizedBox(width: 26),
-                        Expanded(flex: 6, child: form),
-                      ],
+                const SizedBox(height: 36),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final details = _ContactDetails(isArabic: isArabic);
+                    final form = _PortfolioContactForm(isArabic: isArabic);
+                    if (constraints.maxWidth > 760) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(flex: 4, child: details),
+                          const SizedBox(width: 26),
+                          Expanded(flex: 6, child: form),
+                        ],
+                      );
+                    }
+                    return Column(
+                      children: [details, const SizedBox(height: 22), form],
                     );
-                  }
-                  return Column(
-                    children: [details, const SizedBox(height: 22), form],
-                  );
-                },
-              ),
-              const SizedBox(height: 52),
-              const _ReferenceFooter(),
-            ],
-          ),
-        ),
-      );
-}
-
-class _ContactSectionLabel extends StatelessWidget {
-  const _ContactSectionLabel({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0B555B),
-          border: Border.all(color: const Color(0xFF178D93)),
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Text(
-          text,
-          style: GoogleFonts.inter(
-            color: const Color(0xFF69E4E6),
-            fontSize: 11,
-            letterSpacing: 1.1,
-          ),
-        ),
+                  },
+                ),
+                const SizedBox(height: 52),
+                const _ReferenceFooter(),
+              ],
+            ),
+          );
+        },
       );
 }
 
 class _ContactDetails extends StatelessWidget {
   const _ContactDetails({required this.isArabic});
   final bool isArabic;
+
+  static const _aqua = Color(0xFF52D8DE);
 
   static const _entries = [
     ('assets/images/Gmail_logo.png', 'Email', PortfolioData.email),
@@ -94,70 +149,94 @@ class _ContactDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          isArabic ? 'يسعدني أن أسمع منك.' : "Let's make your next idea real.",
-          style: GoogleFonts.inter(
-            color: Colors.white70,
-            fontSize: 15,
-            height: 1.6,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Container(
+          padding: const EdgeInsets.all(22),
+          decoration: BoxDecoration(
+            color: const Color(0xFF4EDDE3).withValues(alpha: .07),
+            border: Border.all(color: _aqua.withValues(alpha: .18)),
+            borderRadius: BorderRadius.circular(20),
           ),
-        ),
-        const SizedBox(height: 22),
-        for (final entry in _entries)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 14),
-            child: Row(
-              children: [
-                Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFC900).withValues(alpha: .1),
-                    borderRadius: BorderRadius.circular(9),
-                  ),
-                  padding: const EdgeInsets.all(6),
-                  child: Image.asset(
-                    entry.$1,
-                    fit: BoxFit.contain,
-                    errorBuilder: (_, __, ___) => const Icon(
-                      Icons.link_rounded,
-                      size: 17,
-                      color: Color(0xFFFFC900),
-                    ),
-                  ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isArabic ? 'يسعدني أن أسمع منك.' : "Let's make your next idea real.",
+                style: GoogleFonts.inter(
+                  color: Colors.white70,
+                  fontSize: 14,
+                  height: 1.6,
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              const SizedBox(height: 22),
+              for (final entry in _entries)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: Row(
                     children: [
-                      Text(
-                        entry.$2,
-                        style: GoogleFonts.inter(
-                          color: Colors.white54,
-                          fontSize: 10,
+                      // White background logo container
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: .15),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(7),
+                        child: Image.asset(
+                          entry.$1,
+                          fit: BoxFit.contain,
+                          errorBuilder: (_, __, ___) => const Icon(
+                            Icons.link_rounded,
+                            size: 18,
+                            color: Color(0xFF032D32),
+                          ),
                         ),
                       ),
-                      Text(
-                        entry.$3,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.inter(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                      const SizedBox(width: 13),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              entry.$2,
+                              style: GoogleFonts.inter(
+                                color: _aqua,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 1.1,
+                              ),
+                            ),
+                            Text(
+                              entry.$3,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.inter(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
+            ],
           ),
-      ],
+        ),
+      ),
     );
   }
 }
@@ -207,57 +286,107 @@ class _PortfolioContactFormState extends State<_PortfolioContactForm> {
   }
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: const Color(0xFF0A4A50).withValues(alpha: .8),
-          border: Border.all(color: const Color(0xFF167C82)),
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.isArabic ? 'أخبرني عن فكرتك' : 'Tell me about your idea',
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(26),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFC900).withValues(alpha: .08),
+              border: Border.all(
+                color: const Color(0xFFFFC900).withValues(alpha: .28),
+              ),
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFFFC900).withValues(alpha: .12),
+                  blurRadius: 32,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 8),
                 ),
-              ),
-              const SizedBox(height: 16),
-              _MessageField(
-                controller: _nameController,
-                label: widget.isArabic ? 'الاسم' : 'Your name',
-              ),
-              const SizedBox(height: 12),
-              _MessageField(
-                controller: _emailController,
-                label: widget.isArabic ? 'البريد الإلكتروني' : 'Your email',
-                isEmail: true,
-              ),
-              const SizedBox(height: 12),
-              _MessageField(
-                controller: _messageController,
-                label: widget.isArabic ? 'رسالتك' : 'Your message',
-                maxLines: 4,
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: AlignmentDirectional.centerEnd,
-                child: FilledButton.icon(
-                  onPressed: _sendMessage,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFFFFC900),
-                    foregroundColor: const Color(0xFF12383A),
+              ],
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFC900).withValues(alpha: .15),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.mark_email_unread_rounded,
+                          color: Color(0xFFFFC900),
+                          size: 18,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        widget.isArabic
+                            ? 'أخبرني عن فكرتك'
+                            : 'Tell me about your idea',
+                        style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
                   ),
-                  icon: const Icon(Icons.send_rounded, size: 16),
-                  label: Text(widget.isArabic ? 'إرسال' : 'Send message'),
-                ),
+                  const SizedBox(height: 22),
+                  _MessageField(
+                    controller: _nameController,
+                    label: widget.isArabic ? 'الاسم' : 'Your name',
+                    icon: Icons.person_outline_rounded,
+                  ),
+                  const SizedBox(height: 14),
+                  _MessageField(
+                    controller: _emailController,
+                    label: widget.isArabic
+                        ? 'البريد الإلكتروني'
+                        : 'Your email',
+                    isEmail: true,
+                    icon: Icons.alternate_email_rounded,
+                  ),
+                  const SizedBox(height: 14),
+                  _MessageField(
+                    controller: _messageController,
+                    label: widget.isArabic ? 'رسالتك' : 'Your message',
+                    maxLines: 4,
+                    icon: Icons.chat_bubble_outline_rounded,
+                  ),
+                  const SizedBox(height: 22),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: _sendMessage,
+                      style: FilledButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFC900),
+                        foregroundColor: const Color(0xFF12383A),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        textStyle: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          letterSpacing: .5,
+                        ),
+                      ),
+                      icon: const Icon(Icons.send_rounded, size: 17),
+                      label: Text(
+                          widget.isArabic ? 'إرسال الرسالة' : 'Send Message'),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       );
@@ -267,11 +396,13 @@ class _MessageField extends StatelessWidget {
   const _MessageField({
     required this.controller,
     required this.label,
+    required this.icon,
     this.isEmail = false,
     this.maxLines = 1,
   });
   final TextEditingController controller;
   final String label;
+  final IconData icon;
   final bool isEmail;
   final int maxLines;
 
@@ -280,15 +411,27 @@ class _MessageField extends StatelessWidget {
         controller: controller,
         maxLines: maxLines,
         keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
-        style: GoogleFonts.inter(color: Colors.white, fontSize: 13),
+        style: GoogleFonts.inter(
+          color: const Color(0xFF032D32),
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+        ),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: GoogleFonts.inter(color: Colors.white60, fontSize: 12),
+          labelStyle: GoogleFonts.inter(
+            color: const Color(0xFF032D32).withValues(alpha: .6),
+            fontSize: 12,
+          ),
+          prefixIcon: Icon(icon, size: 17, color: const Color(0xFF06454A)),
           filled: true,
-          fillColor: Colors.white.withValues(alpha: .08),
+          fillColor: Colors.white,
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(9),
+            borderRadius: BorderRadius.circular(11),
             borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(11),
+            borderSide: const BorderSide(color: Color(0xFFFFC900), width: 1.5),
           ),
           errorStyle: const TextStyle(color: Color(0xFFFFB4AB)),
         ),

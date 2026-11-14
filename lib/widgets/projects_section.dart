@@ -76,206 +76,252 @@ class _ProjectsSectionState extends State<ProjectsSection> {
         final projects = PortfolioData.projects;
         if (_activeIndex >= projects.length) _activeIndex = 0;
 
-        return Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: isWide ? 20 : 16,
-            vertical: isWide ? 64 : 44,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _SectionPill(
-                  text: isArabic ? 'أعمال مختارة' : 'Featured worked.'),
-              const SizedBox(height: 22),
-              Text.rich(
-                TextSpan(
-                  style: GoogleFonts.orbitron(
-                    color: Colors.white,
-                    fontSize: isWide ? 34 : 24,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: isWide ? 7 : 3,
-                    height: 1.25,
-                    shadows: const [
-                      Shadow(
-                        color: Color(0xAA00D4FF),
-                        offset: Offset(2, 2),
-                        blurRadius: 2,
-                      ),
-                    ],
+        return LayoutBuilder(
+          builder: (context, outerConstraints) {
+            final screenWidth = outerConstraints.maxWidth;
+            final hInset =
+                screenWidth > 1200 ? 36.0 : (screenWidth > 700 ? 28.0 : 16.0);
+            final heroLeftOffset = 240.0;
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: isWide ? 64 : 44),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                      left: isWide ? heroLeftOffset : hInset,
+                      right: isWide ? hInset : hInset,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _SectionPill(
+                            text: isArabic
+                                ? '\u0623\u0639\u0645\u0627\u0644 \u0645\u062e\u062a\u0627\u0631\u0629'
+                                : 'Featured worked.'),
+                        const SizedBox(height: 22),
+                        Text.rich(
+                          TextSpan(
+                            style: GoogleFonts.orbitron(
+                              color: Colors.white,
+                              fontSize: isWide ? 34 : 24,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: isWide ? 7 : 3,
+                              height: 1.25,
+                              shadows: const [
+                                Shadow(
+                                  color: Color(0xAA00D4FF),
+                                  offset: Offset(2, 2),
+                                  blurRadius: 2,
+                                ),
+                              ],
+                            ),
+                            children: [
+                              TextSpan(
+                                  text: isArabic
+                                      ? '\u0623\u0639\u0645\u0627\u0644 '
+                                      : 'Things I\u2019ve '),
+                              TextSpan(
+                                text: isArabic
+                                    ? '\u0623\u0646\u062c\u0632\u062a\u0647\u0627.'
+                                    : 'Built.',
+                                style: const TextStyle(color: _aqua),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          isArabic
+                              ? '\u0645\u062c\u0645\u0648\u0639\u0629 \u0645\u0646 \u0627\u0644\u0623\u0641\u0643\u0627\u0631 \u0627\u0644\u062a\u064a \u062a\u062d\u0648\u0644\u062a \u0625\u0644\u0649 \u0645\u0646\u062a\u062c\u0627\u062a \u0631\u0642\u0645\u064a\u0629 \u062d\u0642\u064a\u0642\u064a\u0629.'
+                              : 'A collection of ideas turned into real digital products.',
+                          style: GoogleFonts.orbitron(
+                            color: Colors.white,
+                            fontSize: isWide ? 14 : 11,
+                            letterSpacing: isWide ? 3.6 : 1.2,
+                            height: 1.6,
+                            shadows: const [
+                              Shadow(
+                                color: Color(0xAA00D4FF),
+                                offset: Offset(1, 2),
+                                blurRadius: 2,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  children: [
-                    TextSpan(text: isArabic ? 'أعمال ' : 'Things I’ve '),
-                    TextSpan(
-                      text: isArabic ? 'أنجزتها.' : 'Built.',
-                      style: const TextStyle(color: _aqua),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                isArabic
-                    ? 'مجموعة من الأفكار التي تحولت إلى منتجات رقمية حقيقية.'
-                    : 'A collection of ideas turned into real digital products.',
-                style: GoogleFonts.orbitron(
-                  color: Colors.white,
-                  fontSize: isWide ? 14 : 11,
-                  letterSpacing: isWide ? 3.6 : 1.2,
-                  height: 1.6,
-                  shadows: const [
-                    Shadow(
-                      color: Color(0xAA00D4FF),
-                      offset: Offset(1, 2),
-                      blurRadius: 2,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 30),
-              if (projects.isNotEmpty)
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final width = constraints.maxWidth;
-                    final cardWidth = width < 600
-                        ? width * .92
-                        : math.min(width * .59, 720.0);
-                    final cardHeight = width < 600 ? 455.0 : 350.0;
-                    final sideOffset = cardWidth * (width < 600 ? .88 : .91);
-                    final sideWidth = cardWidth * .72;
-                    final leftPeekOffset =
-                        width < 600 ? sideOffset : width / 2 + sideWidth * .25;
-                    final leftProject =
-                        (_activeIndex - 1 + projects.length) % projects.length;
-                    final rightProject = (_activeIndex + 1) % projects.length;
-                    final cardWidgets = <Widget>[
-                      if (projects.length > 1)
-                        _buildPositionedCard(
-                          project: projects[leftProject],
-                          index: leftProject,
-                          total: projects.length,
-                          isArabic: isArabic,
-                          cardWidth: sideWidth,
-                          cardHeight: cardHeight * .86,
-                          left: (width - sideWidth) / 2 - leftPeekOffset,
-                          top: 28,
-                          rotation: -.14,
-                          active: false,
-                          onTap: () => _move(-1, projects.length),
-                        ),
-                      if (projects.length > 2)
-                        _buildPositionedCard(
-                          project: projects[rightProject],
-                          index: rightProject,
-                          total: projects.length,
-                          isArabic: isArabic,
-                          cardWidth: sideWidth,
-                          cardHeight: cardHeight * .86,
-                          left: (width - sideWidth) / 2 + sideOffset,
-                          top: 28,
-                          rotation: .14,
-                          active: false,
-                          onTap: () => _move(1, projects.length),
-                        ),
-                      _buildPositionedCard(
-                        project: projects[_activeIndex],
-                        index: _activeIndex,
-                        total: projects.length,
-                        isArabic: isArabic,
-                        cardWidth: cardWidth,
-                        cardHeight: cardHeight,
-                        left: (width - cardWidth) / 2,
-                        top: 0,
-                        rotation: 0,
-                        active: true,
-                        onTap: () => _openProject(projects[_activeIndex]),
-                      ),
-                    ];
+                  const SizedBox(height: 30),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: hInset),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        LayoutBuilder(
+                          builder: (context, constraints) {
+                            final width = constraints.maxWidth;
+                            final cardWidth = width < 600
+                                ? width * .92
+                                : math.min(width * .59, 720.0);
+                            final cardHeight = width < 600 ? 455.0 : 350.0;
+                            final sideOffset =
+                                cardWidth * (width < 600 ? .88 : .91);
+                            final sideWidth = cardWidth * .72;
+                            final leftPeekOffset = sideOffset;
+                            final leftProject =
+                                (_activeIndex - 1 + projects.length) %
+                                    projects.length;
+                            final rightProject =
+                                (_activeIndex + 1) % projects.length;
+                            final cardWidgets = <Widget>[
+                              if (projects.length > 1)
+                                _buildPositionedCard(
+                                  project: projects[leftProject],
+                                  index: leftProject,
+                                  total: projects.length,
+                                  isArabic: isArabic,
+                                  cardWidth: sideWidth,
+                                  cardHeight: cardHeight * .86,
+                                  left:
+                                      (width - sideWidth) / 2 - leftPeekOffset,
+                                  top: 28,
+                                  rotation: -.14,
+                                  active: false,
+                                  onTap: () => _move(-1, projects.length),
+                                ),
+                              if (projects.length > 2)
+                                _buildPositionedCard(
+                                  project: projects[rightProject],
+                                  index: rightProject,
+                                  total: projects.length,
+                                  isArabic: isArabic,
+                                  cardWidth: sideWidth,
+                                  cardHeight: cardHeight * .86,
+                                  left: (width - sideWidth) / 2 + sideOffset,
+                                  top: 28,
+                                  rotation: .14,
+                                  active: false,
+                                  onTap: () => _move(1, projects.length),
+                                ),
+                              _buildPositionedCard(
+                                project: projects[_activeIndex],
+                                index: _activeIndex,
+                                total: projects.length,
+                                isArabic: isArabic,
+                                cardWidth: cardWidth,
+                                cardHeight: cardHeight,
+                                left: (width - cardWidth) / 2,
+                                top: 0,
+                                rotation: 0,
+                                active: true,
+                                onTap: () =>
+                                    _openProject(projects[_activeIndex]),
+                              ),
+                            ];
 
-                    return GestureDetector(
-                      onHorizontalDragEnd: (details) {
-                        final velocity = details.primaryVelocity ?? 0;
-                        if (velocity.abs() > 100) {
-                          _move(velocity < 0 ? 1 : -1, projects.length);
-                        }
-                      },
-                      child: SizedBox(
-                        width: width,
-                        height: cardHeight + 48,
-                        child: Stack(
-                          clipBehavior: Clip.hardEdge,
-                          alignment: Alignment.topCenter,
-                          children: [
-                            ...cardWidgets,
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children:
-                                    List.generate(projects.length, (index) {
-                                  final selected = index == _activeIndex;
-                                  return Semantics(
-                                    button: true,
-                                    label: isArabic
-                                        ? 'المشروع ${index + 1}'
-                                        : 'Project ${index + 1}',
-                                    child: InkWell(
-                                      onTap: () =>
-                                          setState(() => _activeIndex = index),
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: AnimatedContainer(
-                                        duration:
-                                            const Duration(milliseconds: 220),
-                                        margin: const EdgeInsets.symmetric(
-                                            horizontal: 6),
-                                        width: selected ? 18 : 10,
-                                        height: 10,
-                                        decoration: BoxDecoration(
-                                          color: selected
-                                              ? _gold
-                                              : _aqua.withValues(alpha: .85),
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
+                            return GestureDetector(
+                              onHorizontalDragEnd: (details) {
+                                final velocity = details.primaryVelocity ?? 0;
+                                if (velocity.abs() > 100) {
+                                  _move(velocity < 0 ? 1 : -1, projects.length);
+                                }
+                              },
+                              child: SizedBox(
+                                width: width,
+                                height: cardHeight + 48,
+                                child: Stack(
+                                  clipBehavior: Clip.none,
+                                  alignment: Alignment.topCenter,
+                                  children: [
+                                    ...cardWidgets,
+                                    Positioned(
+                                      bottom: 0,
+                                      left: 0,
+                                      right: 0,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: List.generate(projects.length,
+                                            (index) {
+                                          final selected =
+                                              index == _activeIndex;
+                                          return Semantics(
+                                            button: true,
+                                            label: isArabic
+                                                ? '\u0627\u0644\u0645\u0634\u0631\u0648\u0639 ${index + 1}'
+                                                : 'Project ${index + 1}',
+                                            child: InkWell(
+                                              onTap: () => setState(
+                                                  () => _activeIndex = index),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              child: AnimatedContainer(
+                                                duration: const Duration(
+                                                    milliseconds: 2000),
+                                                margin:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 6),
+                                                width: selected ? 18 : 10,
+                                                height: 10,
+                                                decoration: BoxDecoration(
+                                                  color: selected
+                                                      ? const Color.fromARGB(
+                                                          255, 132, 105, 7)
+                                                      : _aqua.withValues(
+                                                          alpha: .85),
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }),
                                       ),
                                     ),
-                                  );
-                                }),
+                                  ],
+                                ),
                               ),
+                            );
+                          },
+                        ),
+                        const SizedBox(height: 18),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              tooltip: isArabic
+                                  ? '\u0627\u0644\u0633\u0627\u0628\u0642'
+                                  : 'Previous project',
+                              onPressed: () => _move(-1, projects.length),
+                              icon: const Icon(Icons.arrow_back_ios,
+                                  color: _aqua),
+                            ),
+                            Text(
+                              '${(_activeIndex + 1).toString().padLeft(2, '0')} / ${projects.length.toString().padLeft(2, '0')}',
+                              style: GoogleFonts.inter(
+                                color: Colors.white70,
+                                fontSize: 11,
+                                letterSpacing: 1.4,
+                              ),
+                            ),
+                            IconButton(
+                              tooltip: isArabic
+                                  ? '\u0627\u0644\u062a\u0627\u0644\u064a'
+                                  : 'Next project',
+                              onPressed: () => _move(1, projects.length),
+                              icon: const Icon(Icons.arrow_forward_ios,
+                                  color: _aqua),
                             ),
                           ],
                         ),
-                      ),
-                    );
-                  },
-                ),
-              const SizedBox(height: 18),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    tooltip: isArabic ? 'السابق' : 'Previous project',
-                    onPressed: () => _move(-1, projects.length),
-                    icon: const Icon(Icons.arrow_back_rounded, color: _aqua),
-                  ),
-                  Text(
-                    '${(_activeIndex + 1).toString().padLeft(2, '0')} / ${projects.length.toString().padLeft(2, '0')}',
-                    style: GoogleFonts.inter(
-                      color: Colors.white70,
-                      fontSize: 11,
-                      letterSpacing: 1.4,
+                      ],
                     ),
-                  ),
-                  IconButton(
-                    tooltip: isArabic ? 'التالي' : 'Next project',
-                    onPressed: () => _move(1, projects.length),
-                    icon: const Icon(Icons.arrow_forward_rounded, color: _aqua),
                   ),
                 ],
               ),
-            ],
-          ),
+            );
+          },
         );
       },
     );
@@ -333,15 +379,15 @@ class _CarouselCardPosition extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedPositioned(
-        duration: const Duration(milliseconds: 420),
-        curve: Curves.easeOutCubic,
+        duration: const Duration(milliseconds: 650),
+        curve: Curves.easeInOutCubic,
         left: left,
         top: top,
         width: width,
         height: height,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 420),
-          curve: Curves.easeOutCubic,
+          duration: const Duration(milliseconds: 650),
+          curve: Curves.easeInOutCubic,
           transformAlignment: Alignment.center,
           transform: Matrix4.identity()
             ..setEntry(3, 2, .0012)
@@ -389,7 +435,7 @@ class _FeaturedProjectCard extends StatelessWidget {
           curve: Curves.easeOutCubic,
           decoration: BoxDecoration(
             border: Border.all(
-              color: compact ? _aqua : _gold.withValues(alpha: .25),
+              color: compact ? _aqua : _gold,
               width: 1,
             ),
             borderRadius: BorderRadius.circular(compact ? 24 : 30),
@@ -410,7 +456,7 @@ class _FeaturedProjectCard extends StatelessWidget {
               child: ColoredBox(
                 color: compact
                     ? const Color(0xFF71E5E6).withValues(alpha: .10)
-                    : const Color(0xFFFFC800).withValues(alpha: .25),
+                    : const Color(0xFFFFC800).withOpacity(0.08),
                 child: Stack(
                   children: [
                     Padding(
@@ -559,7 +605,7 @@ class _ProjectCardContent extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             isArabic
-                ? '${details.length} تفاصيل للمشروع'
+                ? '${details.length} \u062a\u0641\u0627\u0635\u064a\u0644 \u0644\u0644\u0645\u0634\u0631\u0648\u0639'
                 : '${details.length} project details',
             maxLines: 1,
             style: GoogleFonts.inter(color: _aqua, fontSize: 9),
@@ -585,7 +631,9 @@ class _ProjectCardContent extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    isArabic ? 'استكشف المشروع' : 'Explore the Project',
+                    isArabic
+                        ? '\u0627\u0633\u062a\u0643\u0634\u0641 \u0627\u0644\u0645\u0634\u0631\u0648\u0639'
+                        : 'Explore the Project',
                     style: GoogleFonts.inter(
                       color: _gold,
                       fontSize: 10,
@@ -608,18 +656,28 @@ class _ProjectCardContent extends StatelessWidget {
     final technologies =
         project.technologies.map((e) => e.toLowerCase()).toList();
     if (technologies.any((e) => e.contains('clinic') || e.contains('health'))) {
-      return isArabic ? 'تقنية صحية' : 'HealthTech';
+      return isArabic
+          ? '\u062a\u0642\u0646\u064a\u0629 \u0635\u062d\u064a\u0629'
+          : 'HealthTech';
     }
     if (technologies.any((e) => e.contains('ai') || e.contains('python'))) {
-      return isArabic ? 'ذكاء اصطناعي' : 'AI & Automation';
+      return isArabic
+          ? '\u0630\u0643\u0627\u0621 \u0627\u0635\u0637\u0646\u0627\u0639\u064a'
+          : 'AI & Automation';
     }
     if (technologies.any((e) => e.contains('erp') || e.contains('business'))) {
-      return isArabic ? 'حلول أعمال' : 'Business';
+      return isArabic
+          ? '\u062d\u0644\u0648\u0644 \u0623\u0639\u0645\u0627\u0644'
+          : 'Business';
     }
     if (technologies.any((e) => e.contains('figma') || e.contains('ui/ux'))) {
-      return isArabic ? 'تصميم منتجات' : 'Product Design';
+      return isArabic
+          ? '\u062a\u0635\u0645\u064a\u0645 \u0645\u0646\u062a\u062c\u0627\u062a'
+          : 'Product Design';
     }
-    return isArabic ? 'منتج رقمي' : 'Digital Product';
+    return isArabic
+        ? '\u0645\u0646\u062a\u062c \u0631\u0642\u0645\u064a'
+        : 'Digital Product';
   }
 
   static IconData _categoryIcon(ProjectModel project) {
