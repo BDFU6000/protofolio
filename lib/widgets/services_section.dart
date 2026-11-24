@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/locale_provider.dart';
+import '../utils/responsive_helper.dart';
+import '../widgets/optimized_image.dart';
 
 const _aqua = Color(0xFF52D8DE);
 const _gold = Color(0xFFFFC900);
@@ -119,7 +121,12 @@ class ServicesSection extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(0, 80, 0, 90),
+                padding: EdgeInsets.fromLTRB(
+                  0,
+                  context.isPhone ? 48 : (isWide ? 80 : 64),
+                  0,
+                  context.isPhone ? 60 : 90,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -127,7 +134,7 @@ class ServicesSection extends StatelessWidget {
                       padding: EdgeInsets.only(left: isWide ? 90 : 0),
                       child: _SectionHeader(isArabic: isArabic, isWide: isWide),
                     ),
-                    SizedBox(height: isWide ? 64 : 44),
+                    SizedBox(height: isWide ? 64 : (context.isPhone ? 32 : 44)),
                     for (var i = 0; i < services.length; i++) ...[
                       if (i > 0)
                         Divider(
@@ -438,14 +445,13 @@ class _RowImage extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: Image.asset(
-          service.image,
+        child: OptimizedImage.asset(
+          assetName: service.image,
           fit: BoxFit.contain,
-          errorBuilder: (_, __, ___) => Padding(
-            padding: const EdgeInsets.all(48),
-            child: Icon(service.icon,
-                color: _aqua.withValues(alpha: .3), size: 56),
-          ),
+          priority: ImageLoadPriority.normal,
+          lazy: true,
+          placeholderIcon: Icons.image_outlined,
+          errorIcon: service.icon,
         ),
       ),
     );
@@ -478,14 +484,16 @@ class _MobileCard extends StatelessWidget {
               ClipRRect(
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(20)),
-                child: Image.asset(
-                  service.image,
-                  width: double.infinity,
-                  fit: BoxFit.contain,
-                  errorBuilder: (_, __, ___) => Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Icon(service.icon,
-                        color: _aqua.withValues(alpha: .3), size: 48),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight: 180),
+                  child: OptimizedImage.asset(
+                    assetName: service.image,
+                    width: double.infinity,
+                    fit: BoxFit.contain,
+                    priority: ImageLoadPriority.normal,
+                    lazy: true,
+                    placeholderIcon: Icons.image_outlined,
+                    errorIcon: service.icon,
                   ),
                 ),
               ),
@@ -508,7 +516,7 @@ class _MobileCard extends StatelessWidget {
                       TextSpan(
                         style: GoogleFonts.poppins(
                           color: Colors.white,
-                          fontSize: 18,
+                          fontSize: 20,
                           fontWeight: FontWeight.w700,
                           height: 1.2,
                         ),
@@ -534,9 +542,9 @@ class _MobileCard extends StatelessWidget {
                     Text(
                       service.description,
                       style: GoogleFonts.inter(
-                        color: Colors.white.withValues(alpha: .72),
-                        fontSize: 12,
-                        height: 1.65,
+                        color: Colors.white.withValues(alpha: .82),
+                        fontSize: 14,
+                        height: 1.6,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -547,7 +555,7 @@ class _MobileCard extends StatelessWidget {
                         for (final tag in service.tags)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 9, vertical: 4),
+                                horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
                               color: _aqua.withValues(alpha: .08),
                               border: Border.all(
@@ -558,7 +566,7 @@ class _MobileCard extends StatelessWidget {
                               tag,
                               style: GoogleFonts.inter(
                                 color: const Color(0xFFC9FAFB),
-                                fontSize: 9,
+                                fontSize: 11,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

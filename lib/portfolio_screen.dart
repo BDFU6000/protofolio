@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'data/portfolio_data.dart';
 import 'utils/locale_provider.dart';
+import 'utils/responsive_helper.dart';
 import 'widgets/about_section.dart';
 import 'widgets/contact_section.dart';
 import 'widgets/experience_section.dart';
@@ -86,9 +87,8 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final horizontalInset =
-        screenWidth > 1200 ? 36.0 : (screenWidth > 700 ? 28.0 : 16.0);
+    final horizontalInset = context.horizontalGutter;
+    final isPhone = context.isPhone;
 
     return Scaffold(
       key: _scaffoldKey,
@@ -217,8 +217,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                                 },
                                 borderRadius: BorderRadius.circular(20),
                                 child: Container(
+                                  constraints: const BoxConstraints(
+                                      minHeight: AppLayout.minTouchTarget),
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 8),
+                                      horizontal: 16, vertical: 12),
                                   decoration: BoxDecoration(
                                     color: Colors.white.withOpacity(0.05),
                                     border: Border.all(
@@ -252,7 +254,9 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                             },
                             child: Container(
                               width: double.infinity,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              constraints: const BoxConstraints(
+                                  minHeight: AppLayout.minTouchTarget),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(colors: [
                                   Color(0xFF00D4FF),
@@ -299,15 +303,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
               ),
             ),
           ),
-          const Positioned(
-            top: -110,
-            left: -150,
-            child: _GlowOrb(size: 300),
+          Positioned(
+            top: isPhone ? -70 : -110,
+            left: isPhone ? -80 : -150,
+            child: _GlowOrb(size: isPhone ? 180 : 300),
           ),
-          const Positioned(
-            top: 480,
-            right: -210,
-            child: _GlowOrb(size: 360),
+          Positioned(
+            top: isPhone ? 360 : 480,
+            right: isPhone ? -110 : -210,
+            child: _GlowOrb(size: isPhone ? 220 : 360),
           ),
           // Main content scrollable
           SingleChildScrollView(
@@ -375,12 +379,15 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
             top: 0,
             left: 0,
             right: 0,
-            child: NavBar(
-              scrollController: _scrollController,
-              sectionKeys: _sectionKeys,
-              activeSection: _activeSection,
-              onNavTap: _scrollToSection,
-              onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+            child: SafeArea(
+              bottom: false,
+              child: NavBar(
+                scrollController: _scrollController,
+                sectionKeys: _sectionKeys,
+                activeSection: _activeSection,
+                onNavTap: _scrollToSection,
+                onMenuTap: () => _scaffoldKey.currentState?.openEndDrawer(),
+              ),
             ),
           ),
         ],

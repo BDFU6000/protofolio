@@ -72,7 +72,47 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/images/
+    - assets/images/Linkedin_logo.webp
+    - assets/images/Moneeb.png
+    - assets/images/doctor_leandek_hero.webp
+    - assets/images/doctor_leandek_home.webp
+    - assets/images/doctor_leandek_services.webp
+    - assets/images/moneeb_salah6_qr.png
+    - assets/images/whatsapp_logo.webp
+    - assets/images/optimized/ai_workflow_800.webp
+    - assets/images/optimized/api_logo_96.webp
+    - assets/images/optimized/business_website_800.webp
+    - assets/images/optimized/csharp_logo_96.webp
+    - assets/images/optimized/custom_software_800.webp
+    - assets/images/optimized/doctor_leandek_login_400.webp
+    - assets/images/optimized/doctor_leandek_main_387.webp
+    - assets/images/optimized/feedme_account_430.webp
+    - assets/images/optimized/feedme_cart_430.webp
+    - assets/images/optimized/feedme_login_430.webp
+    - assets/images/optimized/feedme_main_428.webp
+    - assets/images/optimized/feedme_order_430.webp
+    - assets/images/optimized/feedme_products_430.webp
+    - assets/images/optimized/feedme_profile_430.webp
+    - assets/images/optimized/feedme_shopping_430.webp
+    - assets/images/optimized/figma_logo_96.webp
+    - assets/images/optimized/firebase_logo_96.webp
+    - assets/images/optimized/flutter_logo_96.webp
+    - assets/images/optimized/github_logo_96.webp
+    - assets/images/optimized/gmail_logo_64.webp
+    - assets/images/optimized/instagram_logo_64.webp
+    - assets/images/optimized/linkedin_logo_64.webp
+    - assets/images/optimized/moneeb2_800.webp
+    - assets/images/optimized/moneeb_hero.webp
+    - assets/images/optimized/my_roadmap_800.webp
+    - assets/images/optimized/postgresql_logo_96.webp
+    - assets/images/optimized/python_logo_96.webp
+    - assets/images/optimized/robot_smart_clinic_512.webp
+    - assets/images/optimized/smart-clinic-1600.webp
+    - assets/images/optimized/smart-clinic-800.webp
+    - assets/images/optimized/supabase_logo_96.webp
+    - assets/images/optimized/tamayous_1200.webp
+    - assets/images/optimized/torrance_desktop_1200.webp
+    - assets/images/optimized/torrance_mobile_400.webp
 
   fonts:
     - family: Cairo

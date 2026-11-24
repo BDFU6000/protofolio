@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import '../data/portfolio_data.dart';
 import '../utils/cv_generator.dart';
 import '../utils/locale_provider.dart';
+import '../utils/responsive_helper.dart';
+import '../widgets/optimized_image.dart';
 
 class HeroReferenceSection extends StatelessWidget {
   const HeroReferenceSection({
@@ -22,12 +24,13 @@ class HeroReferenceSection extends StatelessWidget {
             (viewportWidth > 1200 ? 72 : (viewportWidth > 700 ? 56 : 32)))
         .clamp(0.0, 1280.0);
     final isWide = contentWidth > 760;
+    final isPhone = context.isPhone;
     final heroHeight = MediaQuery.sizeOf(context).height.clamp(740.0, 900.0);
     return ValueListenableBuilder<bool>(
       valueListenable: LocaleProvider.isArabic,
       builder: (context, isArabic, _) => SizedBox(
         width: double.infinity,
-        height: isWide ? heroHeight : 1050,
+        height: isWide ? heroHeight : null,
         child: Stack(
           children: [
             Positioned.fill(
@@ -60,10 +63,11 @@ class HeroReferenceSection extends StatelessWidget {
               ),
             ] else ...[
               Padding(
-                padding: const EdgeInsets.fromLTRB(20, 108, 20, 32),
+                padding: EdgeInsets.fromLTRB(
+                    AppLayout.mobileGutter, 96, AppLayout.mobileGutter, 36),
                 child: Column(
                   children: [
-                    const SizedBox(height: 320, child: _Portrait()),
+                    SizedBox(height: isPhone ? 220 : 300, child: _Portrait()),
                     const SizedBox(height: 18),
                     _HeroCopy(isArabic: isArabic, onViewWork: onViewWork),
                     const SizedBox(height: 30),
@@ -99,13 +103,14 @@ class _Portrait extends StatelessWidget {
   const _Portrait();
 
   @override
-  Widget build(BuildContext context) => Image.asset(
-        'assets/images/Moneeb.png',
+  Widget build(BuildContext context) => OptimizedImage.asset(
+        assetName: 'assets/images/Moneeb.png',
         alignment: Alignment.bottomCenter,
         fit: BoxFit.contain,
-        errorBuilder: (_, __, ___) => const Center(
-          child: Icon(Icons.person, color: Colors.white70, size: 160),
-        ),
+        priority: ImageLoadPriority.high,
+        lazy: false,
+        placeholderIcon: Icons.person,
+        errorIcon: Icons.person,
       );
 }
 
@@ -120,8 +125,9 @@ class _HeroCopy extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.sizeOf(context).width > 760;
-    final headlineSize = isWide ? 27.0 : 25.0;
+    final isWide = context.screenWidth > 760;
+    final isPhone = context.isPhone;
+    final headlineSize = isWide ? 27.0 : (isPhone ? 22.0 : 25.0);
     return Column(
       crossAxisAlignment:
           isWide ? CrossAxisAlignment.start : CrossAxisAlignment.center,
@@ -133,7 +139,7 @@ class _HeroCopy extends StatelessWidget {
               fontSize: headlineSize,
               fontWeight: FontWeight.w800,
               height: 1.2,
-              letterSpacing: headlineSize * .2,
+              letterSpacing: headlineSize * (isPhone ? .06 : .2),
               shadows: const [
                 Shadow(
                     color: Color(0xAA00D4FF),
@@ -190,55 +196,129 @@ class _HeroCopy extends StatelessWidget {
             textAlign: isWide ? TextAlign.left : TextAlign.center,
             style: (isArabic ? GoogleFonts.cairo : GoogleFonts.inter)(
               color: Colors.white.withValues(alpha: .88),
-              fontSize: isWide ? 13 : 13,
-              height: 1.75,
-              letterSpacing: 1.0,
+              fontSize: isWide ? 13 : 14,
+              height: 1.6,
+              letterSpacing: isWide ? 1.0 : .2,
             ),
           ),
         ),
         const SizedBox(height: 24),
-        Wrap(
-          alignment: isWide ? WrapAlignment.start : WrapAlignment.center,
-          spacing: 16,
-          runSpacing: 12,
-          children: [
-            _HeroButton(
-                label: isArabic ? 'شاهد أعمالي' : 'View My Work',
-                filled: true,
-                onTap: onViewWork),
-            _HeroButton(
-                label: isArabic ? 'تحميل السيرة الذاتية' : 'Download CV',
-                filled: false,
-                onTap: () => _showCvLanguageDialog(context)),
-          ],
-        ),
+        if (isPhone)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _HeroButton(
+                  label: isArabic ? 'شاهد أعمالي' : 'View My Work',
+                  filled: true,
+                  onTap: onViewWork),
+              const SizedBox(height: 12),
+              _HeroButton(
+                  label: isArabic ? 'تحميل السيرة الذاتية' : 'Download CV',
+                  filled: false,
+                  onTap: () => _showCvLanguageDialog(context)),
+            ],
+          )
+        else
+          Wrap(
+            alignment: isWide ? WrapAlignment.start : WrapAlignment.center,
+            spacing: 16,
+            runSpacing: 12,
+            children: [
+              _HeroButton(
+                  label: isArabic ? 'شاهد أعمالي' : 'View My Work',
+                  filled: true,
+                  onTap: onViewWork),
+              _HeroButton(
+                  label: isArabic ? 'تحميل السيرة الذاتية' : 'Download CV',
+                  filled: false,
+                  onTap: () => _showCvLanguageDialog(context)),
+            ],
+          ),
       ],
     );
   }
 
-  void _showCvLanguageDialog(BuildContext context) {
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
+  Future<void> _showCvLanguageDialog(BuildContext context) async {
+    final bool? language;
+    if (context.isPhone) {
+      language = await showModalBottomSheet<bool>(
+        context: context,
         backgroundColor: const Color(0xFF06454A),
-        title: Text(isArabic ? 'اختر لغة السيرة الذاتية' : 'Select CV language',
-            style: const TextStyle(color: Colors.white)),
-        actions: [
-          TextButton(
-              onPressed: () async {
-                Navigator.pop(dialogContext);
-                await CVGenerator.generateAndDownload(isArabic: false);
-              },
-              child: const Text('English')),
-          TextButton(
-              onPressed: () async {
-                Navigator.pop(dialogContext);
-                await CVGenerator.generateAndDownload(isArabic: true);
-              },
-              child: const Text('العربية')),
-        ],
-      ),
-    );
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+        ),
+        builder: (sheetContext) => SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
+                child: Text(
+                  isArabic ? 'اختر لغة السيرة الذاتية' : 'Select CV language',
+                  style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600),
+                ),
+              ),
+              ListTile(
+                leading: const Icon(Icons.language, color: Color(0xFF69E4E6)),
+                title: const Text('English',
+                    style: TextStyle(color: Colors.white)),
+                onTap: () => Navigator.pop(sheetContext, false),
+              ),
+              ListTile(
+                leading: const Icon(Icons.language, color: Color(0xFF69E4E6)),
+                title: const Text('العربية',
+                    style: TextStyle(color: Colors.white)),
+                onTap: () => Navigator.pop(sheetContext, true),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      language = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: const Color(0xFF06454A),
+          title: Text(
+              isArabic ? 'اختر لغة السيرة الذاتية' : 'Select CV language',
+              style: const TextStyle(color: Colors.white)),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('English')),
+            TextButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: const Text('العربية')),
+          ],
+        ),
+      );
+    }
+    if (language == null || !context.mounted) return;
+    await _downloadCv(context, language);
+  }
+
+  Future<void> _downloadCv(BuildContext context, bool arabic) async {
+    try {
+      await CVGenerator.generateAndDownload(isArabic: arabic);
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(isArabic ? 'تم تحميل السيرة الذاتية' : 'CV downloaded'),
+        ),
+      );
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(isArabic
+              ? 'تعذر تحميل السيرة الذاتية.'
+              : 'Could not download the CV.'),
+        ),
+      );
+    }
   }
 }
 
@@ -261,7 +341,8 @@ class _HeroButton extends StatelessWidget {
             ? BorderSide.none
             : const BorderSide(color: Color(0xFF62DADD)),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(7)),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        minimumSize: const Size(0, AppLayout.minTouchTarget),
         shadowColor: Color(0xFF62DADD).withOpacity(0.25),
       ),
       child: Text(
@@ -269,7 +350,7 @@ class _HeroButton extends StatelessWidget {
         style: (LocaleProvider.isArabic.value
             ? GoogleFonts.cairo
             : GoogleFonts.inter)(
-          fontSize: 12,
+          fontSize: 13,
           fontWeight: FontWeight.w600,
         ),
       ),
@@ -331,7 +412,8 @@ class _ToolsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final wide = MediaQuery.sizeOf(context).width > 760;
+    final wide = context.screenWidth > 760;
+    final isPhone = context.isPhone;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
       decoration: BoxDecoration(
@@ -356,13 +438,13 @@ class _ToolsPanel extends StatelessWidget {
             child: Text(
               isArabic ? 'الأدوات والتقنيات' : 'Tools & Technologies',
               style: (isArabic ? GoogleFonts.cairo : GoogleFonts.inter)(
-                  color: const Color(0xFF69E4E6), fontSize: 10),
+                  color: const Color(0xFF69E4E6), fontSize: 11),
             ),
           ),
           const SizedBox(height: 12),
           LayoutBuilder(
             builder: (context, constraints) {
-              final columns = wide ? 9 : 3;
+              final columns = wide ? 9 : (isPhone ? 2 : 4);
               final width =
                   (constraints.maxWidth - (columns - 1) * 12) / columns;
               return Wrap(
@@ -372,7 +454,7 @@ class _ToolsPanel extends StatelessWidget {
                   for (final (label, logoPath) in _tools)
                     SizedBox(
                       width: width,
-                      height: 90,
+                      height: isPhone ? 84 : 90,
                       child: Container(
                         decoration: BoxDecoration(
                           color: const Color(0xFF0A4046),
@@ -383,16 +465,15 @@ class _ToolsPanel extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: Image.asset(
-                                logoPath,
+                              width: isPhone ? 36 : 40,
+                              height: isPhone ? 36 : 40,
+                              child: OptimizedImage.asset(
+                                assetName: logoPath,
                                 fit: BoxFit.contain,
-                                errorBuilder: (_, __, ___) => Icon(
-                                  Icons.broken_image_outlined,
-                                  color: _toolColor(label),
-                                  size: 25,
-                                ),
+                                priority: ImageLoadPriority.normal,
+                                lazy: false,
+                                placeholderIcon: Icons.image_outlined,
+                                errorIcon: Icons.broken_image_outlined,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -400,7 +481,7 @@ class _ToolsPanel extends StatelessWidget {
                                 textAlign: TextAlign.center,
                                 style: GoogleFonts.inter(
                                     color: Colors.white,
-                                    fontSize: 9,
+                                    fontSize: isPhone ? 11 : 9,
                                     height: 1.15)),
                           ],
                         ),
@@ -413,16 +494,5 @@ class _ToolsPanel extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Color _toolColor(String label) {
-    if (label.startsWith('Flutter')) return const Color(0xFF43D0F2);
-    if (label == 'Figma') return const Color(0xFFF24E1E);
-    if (label == 'Supabase') return const Color(0xFF43D9A3);
-    if (label == 'Firebase') return const Color(0xFFFFC928);
-    if (label == 'Python') return const Color(0xFF4AA3D8);
-    if (label == 'PostgreSQL') return const Color(0xFF9DC5ED);
-    if (label == 'C#') return const Color(0xFF198BDE);
-    return const Color(0xFF56D6DD);
   }
 }

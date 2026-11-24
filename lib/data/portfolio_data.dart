@@ -1,4 +1,4 @@
-﻿import '../models/experience_model.dart';
+import '../models/experience_model.dart';
 import '../models/project_model.dart';
 import '../models/skill_model.dart';
 import '../utils/locale_provider.dart';
@@ -323,7 +323,20 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Flutter', 'Dart', 'Supabase', 'PostgreSQL', 'Riverpod'],
       emoji: '🏥',
       gradientColors: [0xFF1a1a2e, 0xFF16213e],
-      imageUrl: 'assets/images/smartclinic_logo.png',
+      completionDate: '2025',
+      imageUrl: 'assets/images/smart-clinic.png',
+      featuredVisual: 'desktop',
+      featuredImages: [
+        'assets/images/smart-clinic.png',
+      ],
+      gallery: [
+        ProjectGalleryItem(
+          title: 'لوحة نظام العيادة',
+          imageUrl: 'assets/images/smart-clinic.png',
+          caption:
+              'عمليات العيادة متعددة المستأجرين داخل مساحة عمل واحدة على سطح المكتب.',
+        ),
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'نطاق المشروع',
@@ -352,6 +365,7 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Flutter', 'Dart', 'UI/UX', 'Product Planning'],
       emoji: '📱',
       gradientColors: [0xFF0f172a, 0xFF1d4ed8],
+      completionDate: '2025',
       detailedSections: [
         ProjectDetailSection(
           title: 'دور المشروع',
@@ -374,25 +388,66 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Flutter', 'Dart', 'Supabase', 'Firebase', 'Google Maps'],
       emoji: '💊',
       gradientColors: [0xFF0f3460, 0xFF533483],
-      imageUrl: 'assets/images/image.png',
+      completionDate: '2025',
+      imageUrl: 'assets/images/doctor_leandek_main.png',
+      featuredVisual: 'mobile',
+      featuredImages: [
+        'assets/images/doctor_leandek_login.png',
+        'assets/images/doctor_leandek_main.png',
+      ],
+      keyFeatures: [
+        'تسجيل الدخول برقم الهاتف عبر OTP وإعداد ملف المريض',
+        'الرئيسية مع تصنيفات الخدمات الصحية',
+        'طلبات حجز الأطباء والممرضات',
+        'تصفح الصيدلية والوصفات وطلب الأدوية',
+        'تتبع التوصيل المرتبط بالموقع عبر Google Maps',
+        'لوحات إدارية وصيدلية لإدارة سير الخدمة',
+      ],
+      gallery: [
+        ProjectGalleryItem(
+          title: 'تسجيل دخول آمن',
+          imageUrl: 'assets/images/doctor_leandek_login.png',
+          caption: 'دخول عبر رمز OTP وإعداد ملف المريض.',
+        ),
+        ProjectGalleryItem(
+          title: 'الرئيسية للخدمات',
+          imageUrl: 'assets/images/doctor_leandek_main.png',
+          caption: 'لوحة رئيسية للخدمات والطلبات الصحية.',
+        ),
+        ProjectGalleryItem(
+          title: 'خدمات الرعاية',
+          imageUrl: 'assets/images/doctor_leandek_services.webp',
+          caption: 'تصنيفات تجمع الرعاية والصيدلية والتوصيل.',
+        ),
+        ProjectGalleryItem(
+          title: 'سير الصيدلية',
+          imageUrl: 'assets/images/doctor_leandek_home.webp',
+          caption: 'رحلة المريض مع الصيدلية وطلب الأدوية.',
+        ),
+        ProjectGalleryItem(
+          title: 'نظرة المريض',
+          imageUrl: 'assets/images/doctor_leandek_hero.webp',
+          caption: 'نظرة عامة على المنظومة عبر الواجهات المختلفة.',
+        ),
+      ],
       detailedSections: [
         ProjectDetailSection(
-          title: 'المساهمة الفردية',
+          title: 'رحلة المريض اليومية',
           content:
-              'قمت بالمساهمة المباشرة في تصميم واجهات المستخدم، هوية العلامة التجارية، التنفيذ التقني، تكامل الخلفية، إدارة المنتج، وتنظيم تدفق الخدمات داخل النظام.',
-          iconEmoji: '🎨',
+              'يدخل المريض برقم الهاتف عبر OTP، ثم يستخدم الرئيسية لاكتشاف الخدمات الصحية وطلب المواعيد وبدء طلبات الأدوية من الصيدلية.',
+          iconEmoji: '📱',
         ),
         ProjectDetailSection(
-          title: 'سير العمل الصحي',
+          title: 'الصيدلية والتوصيل',
           content:
-              'تغطي المنظومة عمليات المرضى، الأطباء، الممرضات، الصيدليات، الوصفات، التوصيل، والخدمات اللوجستية المرتبطة بالرعاية الصحية.',
-          iconEmoji: '🌐',
+              'تربط الوصفات وطلب الأدوية وتتبع التوصيل المرتبط بالموقع بين تطبيق المريض وعمليات الصيدلية والتنسيق عبر الخرائط.',
+          iconEmoji: '🚚',
         ),
         ProjectDetailSection(
-          title: 'التكامل التقني',
+          title: 'الواجهات الإدارية',
           content:
-              'تم استخدام Flutter وSupabase وFirebase وGoogle Maps بالإضافة إلى مصادقة OTP عبر الهاتف وSupabase Edge Functions، مع استخدام SharedPreferences لتخزين بعض بيانات الجلسة المحلية.',
-          iconEmoji: '⚡',
+              'تدعم لوحات الصيدلية والإدارة الجانب التشغيلي من المنظومة، إلى جانب موقع الشركة والمنتج الموجه للمريض.',
+          iconEmoji: '🧩',
         ),
       ],
     ),
@@ -403,6 +458,27 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Flutter', 'Supabase', 'Python', 'AI Integration'],
       emoji: '🤖',
       gradientColors: [0xFF0f172a, 0xFF7c3aed],
+      completionDate: '2025',
+      imageUrl: 'assets/images/smart-clinic.png',
+      featuredVisual: 'desktop-robot',
+      featuredImages: [
+        'assets/images/smart-clinic.png',
+        'assets/images/Robot_smart_clinic.png',
+      ],
+      gallery: [
+        ProjectGalleryItem(
+          title: 'مساحة عمل المساعد الذكي',
+          imageUrl: 'assets/images/smart-clinic.png',
+          caption:
+              'واجهة Smart Clinic التي يعمل داخلها المساعد لدعم المهام اليومية.',
+        ),
+        ProjectGalleryItem(
+          title: 'هوية المساعد',
+          imageUrl: 'assets/images/Robot_smart_clinic.png',
+          caption:
+              'شخصية الروبوت المستخدمة لإظهار طبقة الذكاء الاصطناعي بأسلوب واضح وقريب.',
+        ),
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'دور المساعد داخل المنتج',
@@ -432,6 +508,7 @@ I have led university project teams as part of my academic work, coordinating ta
       ],
       emoji: '📈',
       gradientColors: [0xFF111827, 0xFF065f46],
+      completionDate: '2025',
       liveUrl:
           'https://docs.google.com/spreadsheets/d/16ZONKqGDntWeHtt9qioxUlpQ2bSFLbrtKTM-2z3EQmA/edit?usp=sharing',
       detailedSections: [
@@ -456,6 +533,7 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Python', 'Speech Data', 'Chatterbox', 'GPU Research'],
       emoji: '🎙️',
       gradientColors: [0xFF1f2937, 0xFFb91c1c],
+      completionDate: '2026',
       detailedSections: [
         ProjectDetailSection(
           title: 'إعداد البيانات',
@@ -484,6 +562,12 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Figma', 'Responsive Web', 'Vercel', 'UI/UX'],
       emoji: '🌐',
       gradientColors: [0xFF0f172a, 0xFF0ea5e9],
+      completionDate: '2024',
+      featuredVisual: 'responsive',
+      featuredImages: [
+        'assets/images/Tamayous_website.png',
+        'assets/images/Tamayous_website.png',
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'مجال الموقع',
@@ -512,6 +596,7 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['ERPNext', 'Business Workflow Design', 'Process Mapping'],
       emoji: '📦',
       gradientColors: [0xFF111827, 0xFF7c2d12],
+      completionDate: '2024',
       detailedSections: [
         ProjectDetailSection(
           title: 'التحليل الوظيفي',
@@ -534,18 +619,51 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Figma', 'UX/UI', 'Responsive Design', 'Concept Design'],
       emoji: '🏗️',
       gradientColors: [0xFF1f2937, 0xFFf59e0b],
+      liveUrl: 'https://concept-jade-eta.vercel.app/',
+      completionDate: '2025',
+      featuredVisual: 'desktop-mobile',
+      featuredImages: [
+        'assets/images/torrance_website_desktop.jpg',
+        'assets/images/torrance_website_mobile.png',
+      ],
+      websiteComparison: ProjectWebsiteComparison(
+        newUrl: 'https://concept-jade-eta.vercel.app/',
+        oldUrl: 'https://www.torranceexpertconcrete.com/',
+        newLabel: 'المفهوم الجديد',
+        oldLabel: 'التصميم الحالي',
+        summary:
+            'تعريف الزائر بالخدمات بشكل أسرع، وتقليل المسافة بينه وبين طلب السعر، مع عرض متجاوب يعمل بوضوح على الهاتف وسطح المكتب.',
+        improvements: [
+          'هيكل صفحات أوضح يبدأ بالخدمات ثم الإثبات ثم دعوة طلب السعر.',
+          'تسلسل بصري أقوى وعناوين وأزرار أكثر وضوحاً لكل مرحلة من رحلة العميل.',
+          'تصميم متجاوب حقيقي للهاتف بدلاً من الاعتماد على عرض سطح المكتب فقط.',
+          'تبسيط النصوص وتقليل الفوضى البصرية وإبراز معلومات التواصل والثقة.',
+        ],
+      ),
       detailedSections: [
         ProjectDetailSection(
-          title: 'الغرض',
+          title: 'ما تم تنفيذه',
           content:
-              'كان هذا المفهوم تجريبياً ومبكراً، وتم تطويره بشكل مستقل أثناء متابعة عميل محتمل. لم يتم تكليفه أو اعتماده أو تنفيذه من قِبل الشركة.',
-          iconEmoji: '💡',
+              'بنيت نسخة تصورية كاملة للموقع ونشرتها على Vercel، مع إعادة تنظيم المحتوى حول الخدمات، طلب السعر، عرض الأعمال، ومعلومات التواصل. النسخة مصممة كنموذج قابل للتصفح وليست تعديلاً رسمياً على الموقع الحالي للشركة.',
+          iconEmoji: '🧩',
         ),
         ProjectDetailSection(
-          title: 'التركيز التصميمي',
+          title: 'كيف تم التنفيذ',
           content:
-              'ركزت الفكرة على اكتشاف الخدمات، طلبات الاستفسار، وضوح العرض المرئي، تناسب الموقع مع الشاشات المختلفة، وتفاعل تقدير التكلفة.',
-          iconEmoji: '📐',
+              'بدأت بتحليل الموقع الحالي وتحديد رحلة الزائر من صفحة البداية حتى طلب السعر. بعدها أعدت صياغة الهيكل المعلوماتي، وصممت نظام ألوان وطباعة وتخطيط متجاوب في Figma، ثم حوّلت التصميم إلى نموذج ويب فعلي مع أقسام واضحة، دعوات إجراء متكررة، وتجربة استخدام متسقة على الهاتف وسطح المكتب.',
+          iconEmoji: '🛠️',
+        ),
+        ProjectDetailSection(
+          title: 'الفرق والتطوير',
+          content:
+              'الموقع الحالي يقدم المعلومات بشكل تقليدي، بينما يركز المفهوم الجديد على وصول أسرع إلى الخدمة المطلوبة، مسار أوضح لطلب التسعير، هيكل بصري أكثر تنظيماً، وتجاوب أفضل مع أحجام الشاشات. الهدف كان تقليل الإدراك والارتباك وزيادة ثقة الزائر قبل التواصل.',
+          iconEmoji: '📈',
+        ),
+        ProjectDetailSection(
+          title: 'الطبيعة التجريبية',
+          content:
+              'هذا العمل تجريبي ومستقل، وتم تطويره أثناء متابعة عميل محتمل. لم يتم تكليفه أو اعتماده أو تنفيذه من قِبل الشركة، ويُعرض هنا كدراسة تصميم ومقارنة بين التصميم الحالي والمفهوم المقترح.',
+          iconEmoji: '💡',
         ),
       ],
     ),
@@ -556,6 +674,45 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Figma', 'Product Design', 'Mobile UI/UX'],
       emoji: '🍽️',
       gradientColors: [0xFF111827, 0xFFef4444],
+      completionDate: '2025',
+      imageUrl: 'assets/images/Main Page.png',
+      featuredVisual: 'mobile',
+      featuredImages: [
+        'assets/images/Login Page.png',
+        'assets/images/Main Page.png',
+      ],
+      gallery: [
+        ProjectGalleryItem(
+          title: 'صفحة التسوق',
+          imageUrl: 'assets/images/Shopping Page.png',
+          caption: 'تصفح الأصناف وبناء الطلب',
+        ),
+        ProjectGalleryItem(
+          title: 'تفاصيل المنتج',
+          imageUrl: 'assets/images/Products detiaes Page.png',
+          caption: 'خيارات التخصيص قبل الإضافة للسلة',
+        ),
+        ProjectGalleryItem(
+          title: 'سلة التسوق',
+          imageUrl: 'assets/images/Cart Page.png',
+          caption: 'مراجعة الطلب قبل التأكيد',
+        ),
+        ProjectGalleryItem(
+          title: 'تتبع الطلب',
+          imageUrl: 'assets/images/Order tracking Page.png',
+          caption: 'متابعة التوصيل بعد تأكيد الطلب',
+        ),
+        ProjectGalleryItem(
+          title: 'الحساب',
+          imageUrl: 'assets/images/Account Page.png',
+          caption: 'إدارة بيانات الحساب',
+        ),
+        ProjectGalleryItem(
+          title: 'الملف الشخصي',
+          imageUrl: 'assets/images/Profile page.png',
+          caption: 'إعدادات الملف الشخصي',
+        ),
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'مجال التطبيق',
@@ -581,7 +738,20 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Flutter', 'Dart', 'Supabase', 'PostgreSQL', 'Riverpod'],
       emoji: '🏥',
       gradientColors: [0xFF1a1a2e, 0xFF16213e],
-      imageUrl: 'assets/images/smartclinic_logo.png',
+      completionDate: '2025',
+      imageUrl: 'assets/images/smart-clinic.png',
+      featuredVisual: 'desktop',
+      featuredImages: [
+        'assets/images/smart-clinic.png',
+      ],
+      gallery: [
+        ProjectGalleryItem(
+          title: 'Clinic ERP dashboard',
+          imageUrl: 'assets/images/smart-clinic.png',
+          caption:
+              'Multi-tenant clinic operations in a single desktop workspace.',
+        ),
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'Project Scope',
@@ -610,6 +780,7 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Flutter', 'Dart', 'UI/UX', 'Product Planning'],
       emoji: '📱',
       gradientColors: [0xFF0f172a, 0xFF1d4ed8],
+      completionDate: '2025',
       detailedSections: [
         ProjectDetailSection(
           title: 'Project Role',
@@ -632,25 +803,66 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Flutter', 'Dart', 'Supabase', 'Firebase', 'Google Maps'],
       emoji: '💊',
       gradientColors: [0xFF0f3460, 0xFF533483],
-      imageUrl: 'assets/images/image.png',
+      completionDate: '2025',
+      imageUrl: 'assets/images/doctor_leandek_main.png',
+      featuredVisual: 'mobile',
+      featuredImages: [
+        'assets/images/doctor_leandek_login.png',
+        'assets/images/doctor_leandek_main.png',
+      ],
+      keyFeatures: [
+        'Phone OTP sign-in and patient profile setup',
+        'Home dashboard with healthcare service categories',
+        'Doctor and nurse appointment requests',
+        'Pharmacy browsing, prescriptions, and medication ordering',
+        'Location-aware delivery tracking with Google Maps',
+        'Admin and pharmacy panels for managing service workflows',
+      ],
+      gallery: [
+        ProjectGalleryItem(
+          title: 'Secure sign-in',
+          imageUrl: 'assets/images/doctor_leandek_login.png',
+          caption: 'Phone OTP onboarding and patient profile entry.',
+        ),
+        ProjectGalleryItem(
+          title: 'Service home',
+          imageUrl: 'assets/images/doctor_leandek_main.png',
+          caption: 'Main dashboard for healthcare services and requests.',
+        ),
+        ProjectGalleryItem(
+          title: 'Care services',
+          imageUrl: 'assets/images/doctor_leandek_services.webp',
+          caption: 'Service categories spanning care, pharmacy, and delivery.',
+        ),
+        ProjectGalleryItem(
+          title: 'Pharmacy workflow',
+          imageUrl: 'assets/images/doctor_leandek_home.webp',
+          caption: 'Patient-facing pharmacy and medication journey.',
+        ),
+        ProjectGalleryItem(
+          title: 'Patient overview',
+          imageUrl: 'assets/images/doctor_leandek_hero.webp',
+          caption: 'Health ecosystem overview across connected surfaces.',
+        ),
+      ],
       detailedSections: [
         ProjectDetailSection(
-          title: 'Individual Contribution',
+          title: 'Daily patient journey',
           content:
-              'I contributed to UI/UX design, visual identity, technical implementation, backend integration, product planning, and coordination across the ecosystem to align stakeholders and workflows.',
-          iconEmoji: '🎨',
+              'Patients enter with phone OTP, set up their profile, then use the home dashboard to discover healthcare services, request appointments, and start pharmacy orders.',
+          iconEmoji: '📱',
         ),
         ProjectDetailSection(
-          title: 'Healthcare Workflow',
+          title: 'Pharmacy and delivery',
           content:
-              'The system covered patient journeys, doctor interactions, pharmacy operations, prescriptions, delivery flow, and location-aware service coordination.',
-          iconEmoji: '🌐',
+              'Prescriptions, medication ordering, and location-aware delivery tracking connect the patient app with pharmacy operations and maps-based coordination.',
+          iconEmoji: '🚚',
         ),
         ProjectDetailSection(
-          title: 'Technical Integration',
+          title: 'Admin surfaces',
           content:
-              'The product used Flutter and Supabase, with Firebase, Google Maps, phone OTP flow, Supabase Edge Functions, and SharedPreferences for local session handling.',
-          iconEmoji: '⚡',
+              'Pharmacy and administrative panels support the operational side of the ecosystem, alongside the company website and patient-facing mobile product.',
+          iconEmoji: '🧩',
         ),
       ],
     ),
@@ -661,6 +873,27 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Flutter', 'Supabase', 'Python', 'AI Integration'],
       emoji: '🤖',
       gradientColors: [0xFF0f172a, 0xFF7c3aed],
+      completionDate: '2025',
+      imageUrl: 'assets/images/smart-clinic.png',
+      featuredVisual: 'desktop-robot',
+      featuredImages: [
+        'assets/images/smart-clinic.png',
+        'assets/images/Robot_smart_clinic.png',
+      ],
+      gallery: [
+        ProjectGalleryItem(
+          title: 'AI assistant workspace',
+          imageUrl: 'assets/images/smart-clinic.png',
+          caption:
+              'The Smart Clinic interface where the assistant supports daily work.',
+        ),
+        ProjectGalleryItem(
+          title: 'Assistant identity',
+          imageUrl: 'assets/images/Robot_smart_clinic.png',
+          caption:
+              'Robot character used to make the AI layer visible and approachable.',
+        ),
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'Role in Product',
@@ -690,6 +923,7 @@ I have led university project teams as part of my academic work, coordinating ta
       ],
       emoji: '📈',
       gradientColors: [0xFF111827, 0xFF065f46],
+      completionDate: '2025',
       liveUrl:
           'https://docs.google.com/spreadsheets/d/16ZONKqGDntWeHtt9qioxUlpQ2bSFLbrtKTM-2z3EQmA/edit?usp=sharing',
       detailedSections: [
@@ -714,6 +948,7 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Python', 'Speech Data', 'Chatterbox', 'GPU Research'],
       emoji: '🎙️',
       gradientColors: [0xFF1f2937, 0xFFb91c1c],
+      completionDate: '2026',
       detailedSections: [
         ProjectDetailSection(
           title: 'Dataset Preparation',
@@ -742,6 +977,12 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Figma', 'Responsive Web', 'Vercel', 'UI/UX'],
       emoji: '🌐',
       gradientColors: [0xFF0f172a, 0xFF0ea5e9],
+      completionDate: '2024',
+      featuredVisual: 'responsive',
+      featuredImages: [
+        'assets/images/Tamayous_website.png',
+        'assets/images/Tamayous_website.png',
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'Website Scope',
@@ -770,6 +1011,7 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['ERPNext', 'Business Workflow Design', 'Process Mapping'],
       emoji: '📦',
       gradientColors: [0xFF111827, 0xFF7c2d12],
+      completionDate: '2024',
       detailedSections: [
         ProjectDetailSection(
           title: 'Operational Analysis',
@@ -792,18 +1034,51 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Figma', 'UX/UI', 'Responsive Design', 'Concept Design'],
       emoji: '🏗️',
       gradientColors: [0xFF1f2937, 0xFFf59e0b],
+      liveUrl: 'https://concept-jade-eta.vercel.app/',
+      completionDate: '2025',
+      featuredVisual: 'desktop-mobile',
+      featuredImages: [
+        'assets/images/torrance_website_desktop.jpg',
+        'assets/images/torrance_website_mobile.png',
+      ],
+      websiteComparison: ProjectWebsiteComparison(
+        newUrl: 'https://concept-jade-eta.vercel.app/',
+        oldUrl: 'https://www.torranceexpertconcrete.com/',
+        newLabel: 'New concept',
+        oldLabel: 'Current design',
+        summary:
+            'Help visitors understand the services faster, shorten the path to a quote request, and present the business clearly on both phone and desktop.',
+        improvements: [
+          'A clearer page structure: services first, proof next, then a direct quote request.',
+          'Stronger visual hierarchy with clearer headings, spacing, and repeatable calls to action.',
+          'A genuinely responsive phone layout instead of relying on the desktop presentation.',
+          'Simplified copy and reduced visual noise while keeping contact and trust signals prominent.',
+        ],
+      ),
       detailedSections: [
         ProjectDetailSection(
-          title: 'Purpose',
+          title: 'What I Built',
           content:
-              'This was a concept-only exploration developed independently while pursuing a prospective client. It was not commissioned, approved, or implemented by the business itself.',
-          iconEmoji: '💡',
+              'I created a complete concept site and deployed it on Vercel. The content was reorganised around services, quote requests, selected work, and contact details. It is a browsable prototype, not an official modification of the company’s current website.',
+          iconEmoji: '🧩',
         ),
         ProjectDetailSection(
-          title: 'Design Focus',
+          title: 'How I Built It',
           content:
-              'The concept focused on service discovery, inquiry flow, responsive presentation, and improved quote-request accessibility for prospective customers.',
-          iconEmoji: '📐',
+              'I started by reviewing the current site and mapping the visitor journey from the landing page to the quote request. I then rebuilt the information architecture, defined a responsive colour, typography, and layout system in Figma, and translated it into a working web prototype with clear sections, repeated calls to action, and consistent behaviour on phone and desktop.',
+          iconEmoji: '🛠️',
+        ),
+        ProjectDetailSection(
+          title: 'The Difference',
+          content:
+              'The current site presents information in a traditional way. The new concept focuses on faster service discovery, a clearer quote path, a more organised visual hierarchy, and better adaptation to different screen sizes. The goal was to reduce friction and uncertainty before a visitor gets in touch.',
+          iconEmoji: '📈',
+        ),
+        ProjectDetailSection(
+          title: 'Concept Status',
+          content:
+              'This work is independent and exploratory. It was developed while pursuing a prospective client and was not commissioned, approved, or implemented by the business. It is shown here as a design study and a side-by-side comparison between the current design and the proposed concept.',
+          iconEmoji: '💡',
         ),
       ],
     ),
@@ -814,6 +1089,45 @@ I have led university project teams as part of my academic work, coordinating ta
       technologies: ['Figma', 'Product Design', 'Mobile UI/UX'],
       emoji: '🍽️',
       gradientColors: [0xFF111827, 0xFFef4444],
+      completionDate: '2025',
+      imageUrl: 'assets/images/Main Page.png',
+      featuredVisual: 'mobile',
+      featuredImages: [
+        'assets/images/Login Page.png',
+        'assets/images/Main Page.png',
+      ],
+      gallery: [
+        ProjectGalleryItem(
+          title: 'Shopping',
+          imageUrl: 'assets/images/Shopping Page.png',
+          caption: 'Browse categories and build an order',
+        ),
+        ProjectGalleryItem(
+          title: 'Product Details',
+          imageUrl: 'assets/images/Products detiaes Page.png',
+          caption: 'Customize an item before adding it to the cart',
+        ),
+        ProjectGalleryItem(
+          title: 'Cart',
+          imageUrl: 'assets/images/Cart Page.png',
+          caption: 'Review the order before checkout',
+        ),
+        ProjectGalleryItem(
+          title: 'Order Tracking',
+          imageUrl: 'assets/images/Order tracking Page.png',
+          caption: 'Follow delivery after checkout',
+        ),
+        ProjectGalleryItem(
+          title: 'Account',
+          imageUrl: 'assets/images/Account Page.png',
+          caption: 'Manage account details',
+        ),
+        ProjectGalleryItem(
+          title: 'Profile',
+          imageUrl: 'assets/images/Profile page.png',
+          caption: 'Profile settings',
+        ),
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'Domain',

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../data/portfolio_data.dart';
 import '../utils/locale_provider.dart';
+import '../utils/responsive_helper.dart';
 import '../utils/theme_provider.dart';
 
 class NavBar extends StatefulWidget {
@@ -50,9 +51,10 @@ class _NavBarState extends State<NavBar> {
     return ValueListenableBuilder<bool>(
       valueListenable: LocaleProvider.isArabic,
       builder: (context, isArabic, _) {
-        final isWide = MediaQuery.of(context).size.width > 920;
-        final inset = MediaQuery.of(context).size.width > 1200 ? 36.0 : 16.0;
+        final isWide = context.screenWidth > AppLayout.compactNavMaxWidth;
+        final inset = context.horizontalGutter;
         final isDark = Theme.of(context).brightness == Brightness.dark;
+        final showCompactLogo = !isWide && context.isPhone;
 
         return AnimatedContainer(
           duration: const Duration(milliseconds: 300),
@@ -76,7 +78,12 @@ class _NavBarState extends State<NavBar> {
           padding: EdgeInsets.symmetric(horizontal: inset, vertical: 12),
           child: Row(
             children: [
-              Flexible(child: _Logo(name: PortfolioData.name)),
+              Flexible(
+                child: _Logo(
+                  name: PortfolioData.name,
+                  compact: showCompactLogo,
+                ),
+              ),
               const Spacer(),
               if (isWide) ...[
                 Row(
@@ -100,9 +107,9 @@ class _NavBarState extends State<NavBar> {
               ] else ...[
                 _ThemeToggle(isDark: isDark),
                 IconButton(
-                  icon: Icon(Icons.menu_rounded,
-                      color: isDark ? Colors.white : Color(0xFF1D1B1C),
-                      size: 28),
+                  tooltip: isArabic ? 'القائمة' : 'Open menu',
+                  icon: const Icon(Icons.menu_rounded,
+                      color: Colors.white, size: 28),
                   onPressed: widget.onMenuTap,
                 ),
               ],
@@ -115,8 +122,9 @@ class _NavBarState extends State<NavBar> {
 }
 
 class _Logo extends StatelessWidget {
-  const _Logo({required this.name});
+  const _Logo({required this.name, this.compact = false});
   final String name;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -146,19 +154,21 @@ class _Logo extends StatelessWidget {
                     letterSpacing: 1.5)),
           ),
         ),
-        const SizedBox(width: 12),
-        Flexible(
-          child: Text(name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: (LocaleProvider.isArabic.value
-                      ? GoogleFonts.cairo
-                      : GoogleFonts.playfairDisplay)(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                  letterSpacing: 1.5)),
-        ),
+        if (!compact) ...[
+          const SizedBox(width: 12),
+          Flexible(
+            child: Text(name,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: (LocaleProvider.isArabic.value
+                        ? GoogleFonts.cairo
+                        : GoogleFonts.playfairDisplay)(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    letterSpacing: 1.5)),
+          ),
+        ],
       ],
     );
   }

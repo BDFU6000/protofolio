@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../data/portfolio_data.dart';
 import '../utils/locale_provider.dart';
+import '../utils/responsive_helper.dart';
+import '../widgets/optimized_image.dart';
 
 const _englishAboutCopy =
     '''My experience spans healthcare technology, business automation, ERP customization, and digital product development. I've contributed to projects including Smart Clinic, Sidaliti, Doctor Leandek, and Tamayoz Al-Da'em.
@@ -62,7 +64,7 @@ class AboutSection extends StatelessWidget {
                 top: 0,
                 bottom: 0,
                 width: portraitWidth,
-                child: const _PortraitComposition(),
+                child: const _PortraitComposition(compact: false),
               ),
               Positioned(
                 left: 0,
@@ -80,7 +82,7 @@ class AboutSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 4),
-        _AboutStats(isArabic: isArabic),
+        _AboutStats(isArabic: isArabic, compact: false),
       ],
     );
   }
@@ -92,8 +94,9 @@ class AboutSection extends StatelessWidget {
   ) =>
       Column(
         children: [
-          const SizedBox(height: 300, child: _PortraitComposition()),
-          const SizedBox(height: 24),
+          const SizedBox(
+              height: 240, child: _PortraitComposition(compact: true)),
+          const SizedBox(height: 20),
           _AboutContent(
             paragraphs: paragraphs,
             isArabic: isArabic,
@@ -101,7 +104,7 @@ class AboutSection extends StatelessWidget {
             compact: true,
           ),
           const SizedBox(height: 22),
-          _AboutStats(isArabic: isArabic),
+          _AboutStats(isArabic: isArabic, compact: true),
         ],
       );
 }
@@ -134,7 +137,8 @@ class _AboutContent extends StatelessWidget {
             children: [
               // Pill
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                 decoration: BoxDecoration(
                   color: const Color(0xFF073F45),
                   border: Border.all(color: const Color(0xFF16818A)),
@@ -191,6 +195,7 @@ class _AboutContent extends StatelessWidget {
             foregroundColor: const Color(0xFF032D35),
             elevation: 8,
             shadowColor: _gold.withValues(alpha: .5),
+            minimumSize: const Size(0, AppLayout.minTouchTarget),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(28),
@@ -290,8 +295,8 @@ class _AboutParagraph extends StatelessWidget {
               textAlign: isArabic ? TextAlign.right : TextAlign.left,
               style: (isArabic ? GoogleFonts.cairo : GoogleFonts.inter)(
                 color: const Color(0xFFE5F5F7),
-                fontSize: 11,
-                height: 1.42,
+                fontSize: context.isPhone ? 14 : 11,
+                height: 1.5,
                 letterSpacing: .05,
               ),
             ),
@@ -301,7 +306,9 @@ class _AboutParagraph extends StatelessWidget {
 }
 
 class _PortraitComposition extends StatelessWidget {
-  const _PortraitComposition();
+  const _PortraitComposition({this.compact = false});
+
+  final bool compact;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -318,20 +325,25 @@ class _PortraitComposition extends StatelessWidget {
                 top: 0,
                 bottom: 0,
                 width: portraitSize,
-                child: Image.asset(
-                  'assets/images/moneeb2.png',
+                child: OptimizedImage.asset(
+                  assetName: 'assets/images/moneeb2.png',
                   fit: BoxFit.contain,
                   alignment: Alignment.bottomCenter,
-                  errorBuilder: (_, __, ___) => const Icon(
-                    Icons.person,
-                    size: 180,
-                    color: Color(0xFFDAF8FA),
-                  ),
+                  priority: ImageLoadPriority.normal,
+                  lazy: true,
+                  placeholderIcon: Icons.person,
+                  errorIcon: Icons.person,
                 ),
               ),
-              const Positioned(top: 45, left: 12, child: _FloatingCodeIcon()),
-              const Positioned(top: 115, right: 4, child: _LaptopBadge()),
-              const Positioned(right: 0, top: 230, child: _ProcessBadge()),
+              if (compact) ...[
+                const Positioned(top: 32, left: 8, child: _FloatingCodeIcon()),
+                const Positioned(top: 96, right: 8, child: _LaptopBadge()),
+                const Positioned(right: 8, top: 176, child: _ProcessBadge()),
+              ] else ...[
+                const Positioned(top: 45, left: 12, child: _FloatingCodeIcon()),
+                const Positioned(top: 115, right: 4, child: _LaptopBadge()),
+                const Positioned(right: 0, top: 230, child: _ProcessBadge()),
+              ],
             ],
           );
         },
@@ -458,9 +470,10 @@ class _TechOrbitPainter extends CustomPainter {
 }
 
 class _AboutStats extends StatelessWidget {
-  const _AboutStats({required this.isArabic});
+  const _AboutStats({required this.isArabic, this.compact = false});
 
   final bool isArabic;
+  final bool compact;
 
   static const _cyan = Color(0xFF00D9F5);
 
@@ -502,6 +515,7 @@ class _AboutStats extends StatelessWidget {
                   width: constraints.maxWidth / columns,
                   child: _StatItem(
                     data: stats[index],
+                    compact: compact,
                     showDivider: index % columns != columns - 1 &&
                         index != stats.length - 1,
                   ),
@@ -523,42 +537,52 @@ class _StatData {
 }
 
 class _StatItem extends StatelessWidget {
-  const _StatItem({required this.data, required this.showDivider});
+  const _StatItem({
+    required this.data,
+    required this.showDivider,
+    this.compact = false,
+  });
 
   final _StatData data;
   final bool showDivider;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) => Container(
         constraints: const BoxConstraints(minHeight: 62),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding:
+            EdgeInsets.symmetric(horizontal: compact ? 8 : 12, vertical: 8),
         decoration: BoxDecoration(
           border: showDivider
-              ? const Border(right: BorderSide(color: Color(0x4443DDEC)))
+              ? const BorderDirectional(
+                  end: BorderSide(color: Color(0x4443DDEC)))
               : null,
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(data.icon, color: const Color(0xFF00D9F5), size: 32),
-            const SizedBox(width: 10),
-            Flexible(
+            Icon(data.icon,
+                color: const Color(0xFF00D9F5), size: compact ? 24 : 32),
+            SizedBox(width: compact ? 8 : 10),
+            Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(data.value,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      maxLines: compact ? 2 : 1,
+                      overflow: compact ? null : TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
                           color: const Color(0xFFFFC900),
                           fontWeight: FontWeight.w800,
-                          fontSize: 16)),
+                          fontSize: compact ? 13 : 16)),
                   const SizedBox(height: 2),
                   Text(data.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                      maxLines: compact ? 2 : 1,
+                      overflow: compact ? null : TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                          color: const Color(0xFF58E3EE), fontSize: 10)),
+                          color: const Color(0xFF58E3EE),
+                          fontSize: compact ? 11 : 10)),
                 ],
               ),
             ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/locale_provider.dart';
+import '../utils/responsive_helper.dart';
+import '../widgets/optimized_image.dart';
 
 // ─── Data model ──────────────────────────────────────────────────────────────
 
@@ -385,49 +387,51 @@ class ExperienceSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final imageWidth =
-                        (constraints.maxWidth * .4).clamp(240.0, 420.0);
-                    return SizedBox(
-                      height: wide ? 270 : 220,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 0,
-                            top: 0,
-                            width: wide
-                                ? constraints.maxWidth * .57
-                                : constraints.maxWidth,
-                            child:
-                                _RoadmapIntro(isArabic: isArabic, wide: wide),
-                          ),
-                          if (wide)
+                if (wide)
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final imageWidth =
+                          (constraints.maxWidth * .4).clamp(240.0, 420.0);
+                      return SizedBox(
+                        height: 270,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 0,
+                              top: 0,
+                              width: constraints.maxWidth * .57,
+                              child:
+                                  _RoadmapIntro(isArabic: isArabic, wide: true),
+                            ),
                             Positioned(
                               right: 0,
                               top: 0,
                               bottom: 0,
                               width: imageWidth,
-                              child: Image.asset(
-                                'assets/images/My_roadmap.png',
+                              child: OptimizedImage.asset(
+                                assetName: 'assets/images/My_roadmap.png',
                                 fit: BoxFit.contain,
                                 alignment: Alignment.centerRight,
-                                errorBuilder: (_, __, ___) => const Icon(
-                                  Icons.route_rounded,
-                                  size: 130,
-                                  color: _cyan,
-                                ),
+                                priority: ImageLoadPriority.normal,
+                                lazy: true,
+                                placeholderIcon: Icons.image_outlined,
+                                errorIcon: Icons.route_rounded,
                               ),
                             ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                          ],
+                        ),
+                      );
+                    },
+                  )
+                else
+                  _RoadmapIntro(isArabic: isArabic, wide: false),
                 Align(
                   alignment: AlignmentDirectional.centerEnd,
                   child: TextButton.icon(
                     onPressed: () => _showAllTracks(context, isArabic),
+                    style: TextButton.styleFrom(
+                      minimumSize: const Size(0, AppLayout.minTouchTarget),
+                    ),
                     iconAlignment: IconAlignment.end,
                     icon: const Icon(Icons.arrow_circle_right_rounded,
                         color: _gold, size: 23),
@@ -479,7 +483,7 @@ class ExperienceSection extends StatelessWidget {
       context: context,
       builder: (dialogContext) => Dialog(
         backgroundColor: const Color(0xFF062F35),
-        insetPadding: const EdgeInsets.all(24),
+        insetPadding: EdgeInsets.all(context.isPhone ? 12 : 24),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(22),
           side: const BorderSide(color: _cyan, width: 1),
@@ -607,7 +611,7 @@ class _TrackDetailDialogState extends State<_TrackDetailDialog>
 
     return Dialog(
       backgroundColor: const Color(0xFF062F35),
-      insetPadding: const EdgeInsets.all(22),
+      insetPadding: EdgeInsets.all(context.isPhone ? 12 : 22),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(24),
         side: BorderSide(color: accent, width: 1.3),
@@ -825,62 +829,62 @@ class _RoadmapIntro extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: EdgeInsets.only(left: wide ? 90 : 0),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _RoadmapPill(isArabic: isArabic),
-          const SizedBox(height: 26),
-          Text.rich(
-            TextSpan(
-              style: GoogleFonts.orbitron(
-                color: Colors.white,
-                fontSize: wide ? 28 : 23,
-                fontWeight: FontWeight.w700,
-                height: 1.55,
-                letterSpacing: wide ? 5 : 2,
-                shadows: const [
-                  Shadow(
-                      color: Color(0xAA00D4FF),
-                      offset: Offset(1, 2),
-                      blurRadius: 2),
-                ],
-              ),
-              children: [
-                TextSpan(
-                    text: isArabic ? 'مساري المهني\n' : 'My Professional\n'),
-                TextSpan(
-                  text: isArabic ? 'خريطة التطور' : 'development ',
-                  style: const TextStyle(color: Colors.white),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _RoadmapPill(isArabic: isArabic),
+            SizedBox(height: context.isPhone ? 18 : 26),
+            Text.rich(
+              TextSpan(
+                style: GoogleFonts.orbitron(
+                  color: Colors.white,
+                  fontSize: wide ? 28 : (context.isPhone ? 22 : 23),
+                  fontWeight: FontWeight.w700,
+                  height: 1.35,
+                  letterSpacing: wide ? 5 : (context.isPhone ? .5 : 2),
+                  shadows: const [
+                    Shadow(
+                        color: Color(0xAA00D4FF),
+                        offset: Offset(1, 2),
+                        blurRadius: 2),
+                  ],
                 ),
-                TextSpan(
-                  text: isArabic ? '' : 'roadmap',
-                  style: const TextStyle(color: _gold),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
-          ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: wide ? 570 : 600),
-            child: Text(
-              isArabic
-                  ? 'مسار تعلم منظم يغطي دورة حياة المنتج الرقمي بالكامل، من البحث والتصميم إلى الهندسة والبنية التحتية والنشر.'
-                  : 'A structured learning path covering the entire digital product lifecycle — from research and design to engineering, architecture, and deployment.',
-              style: GoogleFonts.inter(
-                color: Colors.white.withValues(alpha: .88),
-                fontSize: 12,
-                height: 1.8,
-                letterSpacing: 2.2,
-                shadows: const [
-                  Shadow(
-                      color: Color(0x9900D4FF),
-                      offset: Offset(1, 1),
-                      blurRadius: 2),
+                children: [
+                  TextSpan(
+                      text: isArabic ? 'مساري المهني\n' : 'My Professional\n'),
+                  TextSpan(
+                    text: isArabic ? 'خريطة التطور' : 'development ',
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  TextSpan(
+                    text: isArabic ? '' : 'roadmap',
+                    style: const TextStyle(color: _gold),
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
-      ),
+            const SizedBox(height: 16),
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: wide ? 570 : 600),
+              child: Text(
+                isArabic
+                    ? 'مسار تعلم منظم يغطي دورة حياة المنتج الرقمي بالكامل، من البحث والتصميم إلى الهندسة والبنية التحتية والنشر.'
+                    : 'A structured learning path covering the entire digital product lifecycle — from research and design to engineering, architecture, and deployment.',
+                style: GoogleFonts.inter(
+                  color: Colors.white.withValues(alpha: .88),
+                  fontSize: context.isPhone ? 14 : 12,
+                  height: 1.6,
+                  letterSpacing: context.isPhone ? .4 : 2.2,
+                  shadows: const [
+                    Shadow(
+                        color: Color(0x9900D4FF),
+                        offset: Offset(1, 1),
+                        blurRadius: 2),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       );
 }
 

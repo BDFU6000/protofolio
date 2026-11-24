@@ -29,10 +29,92 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
+  <link rel="preload" as="image" href="assets/images/optimized/moneeb_hero.webp" fetchpriority="high">
+  <style>
+    html, body { margin: 0; background: #032D32; }
+    body { background-image: radial-gradient(circle at 8% 6%, rgba(255,201,0,.18), transparent 28%), radial-gradient(circle at 90% 32%, rgba(255,201,0,.16), transparent 30%); }
+  </style>
+
   <title>Abdalmoneeb Abusetta — Portfolio</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <script src="flutter_bootstrap.js" async></script>
+  <script>
+    (function () {
+      var key = 'portfolio_service_worker_version';
+      var bootstrap = 'flutter_bootstrap.js';
+
+      function loadBootstrap() {
+        var script = document.createElement('script');
+        script.src = bootstrap;
+        script.async = true;
+        document.body.appendChild(script);
+      }
+
+      function getStoredVersion() {
+        try { return localStorage.getItem(key); } catch (error) { return null; }
+      }
+
+      function storeVersion(version) {
+        try { localStorage.setItem(key, version); } catch (error) {}
+      }
+
+      function clearServiceWorkers() {
+        if (!('serviceWorker' in navigator)) return Promise.resolve();
+        return navigator.serviceWorker.getRegistrations()
+          .then(function (registrations) {
+            return Promise.all(registrations.map(function (registration) {
+              return registration.unregister();
+            }));
+          });
+      }
+
+      function clearCaches() {
+        if (!window.caches) return Promise.resolve();
+        return caches.keys().then(function (names) {
+          return Promise.all(names.map(function (name) {
+            return caches.delete(name);
+          }));
+        });
+      }
+
+      function checkDeployment() {
+        if (!window.fetch) {
+          loadBootstrap();
+          return;
+        }
+        fetch(bootstrap + '?deployment-check=' + Date.now(), { cache: 'no-store' })
+          .then(function (response) {
+            if (!response.ok) throw new Error('bootstrap fetch failed');
+            return response.text();
+          })
+          .then(function (source) {
+            var match = source.match(/serviceWorkerVersion\s*:\s*"([^"]+)"/);
+            if (!match) {
+              loadBootstrap();
+              return;
+            }
+            var latest = match[1];
+            var current = getStoredVersion();
+            storeVersion(latest);
+            if (current && current !== latest) {
+              clearServiceWorkers()
+                .then(clearCaches)
+                .then(function () { window.location.reload(); })
+                .catch(loadBootstrap);
+              return;
+            }
+            loadBootstrap();
+          })
+          .catch(loadBootstrap);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkDeployment);
+      } else {
+        checkDeployment();
+      }
+    })();
+  </script>
 </body>
 </html>

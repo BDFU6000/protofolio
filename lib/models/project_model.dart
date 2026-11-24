@@ -78,6 +78,11 @@ class ProjectModel {
   /// Optional: Detailed step-by-step sections for the project page.
   final List<ProjectDetailSection>? detailedSections;
 
+  final List<String>? featuredImages;
+  final String? featuredVisual;
+  final String? completionDate;
+  final ProjectWebsiteComparison? websiteComparison;
+
   const ProjectModel({
     required this.title,
     required this.description,
@@ -104,6 +109,28 @@ class ProjectModel {
     this.gallery,
     this.relatedProjects,
     this.detailedSections,
+    this.featuredImages,
+    this.featuredVisual,
+    this.completionDate,
+    this.websiteComparison,
+  });
+}
+
+class ProjectWebsiteComparison {
+  final String newUrl;
+  final String oldUrl;
+  final String newLabel;
+  final String oldLabel;
+  final String summary;
+  final List<String> improvements;
+
+  const ProjectWebsiteComparison({
+    required this.newUrl,
+    required this.oldUrl,
+    required this.newLabel,
+    required this.oldLabel,
+    required this.summary,
+    required this.improvements,
   });
 }
 

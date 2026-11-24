@@ -1,5 +1,17 @@
 import 'package:flutter/material.dart';
 
+abstract final class AppLayout {
+  static const double phoneMaxWidth = 480;
+  static const double mobileMaxWidth = 600;
+  static const double tabletMaxWidth = 960;
+  static const double compactNavMaxWidth = 920;
+  static const double mobileGutter = 16;
+  static const double tabletGutter = 28;
+  static const double desktopGutter = 36;
+  static const double minTouchTarget = 48;
+  static const double stickyNavHeight = 66;
+}
+
 extension ResponsiveContext on BuildContext {
   /// Mobile screen size: width <= 600
   bool get isMobile => MediaQuery.of(this).size.width <= 600;
@@ -20,4 +32,12 @@ extension ResponsiveContext on BuildContext {
 
   /// Quick access to screen height
   double get screenHeight => MediaQuery.of(this).size.height;
+
+  /// Small phones where multi-column layouts must collapse further.
+  bool get isPhone => screenWidth <= AppLayout.phoneMaxWidth;
+
+  /// Page gutter matched to the device class.
+  double get horizontalGutter => screenWidth > 1200
+      ? AppLayout.desktopGutter
+      : (screenWidth > 700 ? AppLayout.tabletGutter : AppLayout.mobileGutter);
 }
