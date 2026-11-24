@@ -581,6 +581,11 @@ class _FeaturedProjectCard extends StatelessWidget {
       builder: (context, constraints) {
         final wideCard = constraints.maxWidth > 480;
         final radius = compact ? 24.0 : 30.0;
+        final tallerMobileVisual = project.featuredVisual == 'desktop' ||
+            project.featuredVisual == 'desktop-robot' ||
+            project.featuredVisual == 'desktop-mobile' ||
+            project.featuredVisual == 'responsive' ||
+            project.featuredVisual == 'plain-image';
         return AnimatedContainer(
           duration: const Duration(milliseconds: 420),
           curve: Curves.easeOutCubic,
@@ -638,6 +643,7 @@ class _FeaturedProjectCard extends StatelessWidget {
                               child: SizedBox.expand(
                                 child: _ProjectVisual(
                                   project: project,
+                                  isArabic: isArabic,
                                   compact: compact,
                                   wide: wideCard,
                                   active: active,
@@ -653,9 +659,12 @@ class _FeaturedProjectCard extends StatelessWidget {
                           Transform.translate(
                             offset: const Offset(0, -34),
                             child: SizedBox(
-                              height: compact ? 115 : 128,
+                              height: compact
+                                  ? (tallerMobileVisual ? 155 : 115)
+                                  : 128,
                               child: _ProjectVisual(
                                 project: project,
+                                isArabic: isArabic,
                                 compact: compact,
                                 wide: wideCard,
                                 active: active,
@@ -890,18 +899,60 @@ class _ProjectCardContent extends StatelessWidget {
 class _ProjectVisual extends StatelessWidget {
   const _ProjectVisual({
     required this.project,
+    required this.isArabic,
     required this.compact,
     required this.wide,
     required this.active,
   });
 
   final ProjectModel project;
+  final bool isArabic;
   final bool compact;
   final bool wide;
   final bool active;
 
   @override
   Widget build(BuildContext context) {
+    if (project.featuredVisual == 'pipeline') {
+      return _PipelineCardVisual(compact: compact, isArabic: isArabic);
+    }
+    if (project.featuredVisual == 'voice-overflow') {
+      final images = project.featuredImages;
+      final asset = (images != null && images.isNotEmpty)
+          ? images.first
+          : project.imageUrl;
+      if (asset != null) {
+        return _VoiceOverflowVisual(
+          assetName: asset,
+          wide: wide,
+          active: active,
+        );
+      }
+    }
+    if (project.featuredVisual == 'infographic') {
+      final images = project.featuredImages;
+      final asset = (images != null && images.isNotEmpty)
+          ? images.first
+          : project.imageUrl;
+      if (asset != null) {
+        return _ProjectImageVisual(
+          assetName: asset,
+          active: active,
+        );
+      }
+    }
+    if (project.featuredVisual == 'plain-image') {
+      final images = project.featuredImages;
+      final asset = (images != null && images.isNotEmpty)
+          ? images.first
+          : project.imageUrl;
+      if (asset != null) {
+        return _PlainProjectImage(
+          assetName: asset,
+          active: active,
+        );
+      }
+    }
     final images = project.featuredImages;
     if (images == null || images.isEmpty) {
       return _ProjectImagePlaceholder(project: project, compact: compact);
@@ -923,6 +974,134 @@ class _ProjectVisual extends StatelessWidget {
     }
     return _ProjectImagePlaceholder(project: project, compact: compact);
   }
+}
+
+class _VoiceOverflowVisual extends StatelessWidget {
+  const _VoiceOverflowVisual({
+    required this.assetName,
+    required this.wide,
+    required this.active,
+  });
+
+  static const _aspect = 371 / 445;
+
+  final String assetName;
+  final bool wide;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final height = constraints.maxHeight;
+          final targetWidth = math.min(
+            width * (wide ? .98 : .91),
+            height * (wide ? 1.38 : 2.28) * _aspect,
+          );
+          final targetHeight = targetWidth / _aspect;
+          final left = width - targetWidth * (wide ? .84 : .98);
+          final top = (height - targetHeight) * (wide ? .42 : .36);
+
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                left: left - targetWidth * .1,
+                top: top + targetHeight * .12,
+                child: Container(
+                  width: targetWidth * 1.05,
+                  height: targetWidth * 1.05,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: RadialGradient(
+                      colors: [
+                        Color(0x4D52D8DE),
+                        Color(0x1A52D8DE),
+                        Color(0x0052D8DE),
+                      ],
+                      stops: [0, .45, 1],
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: left,
+                top: top,
+                child: SizedBox(
+                  width: targetWidth,
+                  height: targetHeight,
+                  child: OptimizedImage.asset(
+                    assetName: assetName,
+                    fit: BoxFit.contain,
+                    priority:
+                        active ? ImageLoadPriority.high : ImageLoadPriority.low,
+                    lazy: false,
+                    semanticLabel: 'Libyan dialect AI voice research visual',
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+}
+
+class _ProjectImageVisual extends StatelessWidget {
+  const _ProjectImageVisual({
+    required this.assetName,
+    required this.active,
+  });
+
+  final String assetName;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, constraints) {
+          return Center(
+            child: Transform.scale(
+              scale: 1.26,
+              child: SizedBox(
+                width: constraints.maxWidth,
+                height: constraints.maxHeight,
+                child: OptimizedImage.asset(
+                  assetName: assetName,
+                  fit: BoxFit.contain,
+                  priority:
+                      active ? ImageLoadPriority.high : ImageLoadPriority.low,
+                  semanticLabel: 'Seven-stage lead generation pipeline',
+                ),
+              ),
+            ),
+          );
+        },
+      );
+}
+
+class _PlainProjectImage extends StatelessWidget {
+  const _PlainProjectImage({
+    required this.assetName,
+    required this.active,
+  });
+
+  final String assetName;
+  final bool active;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, constraints) {
+          return Center(
+            child: OptimizedImage.asset(
+              assetName: assetName,
+              width: constraints.maxWidth,
+              height: constraints.maxHeight,
+              fit: BoxFit.contain,
+              priority: active ? ImageLoadPriority.high : ImageLoadPriority.low,
+              semanticLabel: 'Project visual',
+            ),
+          );
+        },
+      );
 }
 
 class _ProjectImagePlaceholder extends StatelessWidget {
@@ -968,6 +1147,352 @@ class _ProjectImagePlaceholder extends StatelessWidget {
           ],
         ),
       );
+}
+
+class _PipelineCardVisual extends StatelessWidget {
+  const _PipelineCardVisual({required this.compact, required this.isArabic});
+
+  static const _aqua = Color(0xFF52D8DE);
+  static const _gold = Color(0xFFFFC800);
+  static const _stagesEn = [
+    'Public Listings',
+    'Raw Fields',
+    'Clean Records',
+    'Qualified Leads',
+    'Prepare Text',
+    'Outreach Drafts',
+    'Live Reporting',
+  ];
+  static const _stagesAr = [
+    'جمع القوائم',
+    'استخراج الحقول',
+    'تنظيف السجلات',
+    'تأهيل العملاء',
+    'تحضير النصوص',
+    'صياغة التواصل',
+    'التقرير الحي',
+  ];
+
+  final bool compact;
+  final bool isArabic;
+
+  @override
+  Widget build(BuildContext context) {
+    final stages = isArabic ? _stagesAr : _stagesEn;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final height = constraints.maxHeight;
+        final dense = height < 180;
+        final left = math.max(18.0, width * .07);
+        final right = width - left;
+        final topY = height * (dense ? .34 : .32);
+        final bottomY = height * (dense ? .73 : .74);
+        final hoseWidth = dense ? 16.0 : (compact ? 21.0 : 25.0);
+        final nodeSize = dense ? 15.0 : (compact ? 21.0 : 25.0);
+        final arrowSize = dense ? 8.0 : 11.0;
+        final labelHeight = dense ? 12.0 : 16.0;
+        final fontSize = dense ? 7.0 : (compact ? 8.0 : 9.5);
+        final gap = dense ? 1.0 : 3.0;
+        final topLabelTop = math.max(
+          0.0,
+          topY - nodeSize / 2 - arrowSize - gap - labelHeight,
+        );
+        final bottomLabelTop = math.min(
+          height - labelHeight,
+          bottomY + nodeSize / 2 + arrowSize + gap,
+        );
+        final topCell = math.min(width * .30, 100.0);
+        final bottomCell = math.min(width * .36, 120.0);
+        final topXs = [
+          for (var i = 0; i < 4; i++) left + (right - left) * i / 3,
+        ];
+        final bottomXs = [
+          for (var i = 0; i < 3; i++) right - (right - left) * i / 2,
+        ];
+
+        double clampedLeft(double x, double cell) =>
+            math.max(0.0, math.min(width - cell, x - cell / 2));
+
+        return Directionality(
+          textDirection: isArabic ? TextDirection.rtl : TextDirection.ltr,
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFF062F35).withValues(alpha: .72),
+              border: Border.all(
+                color: _aqua.withValues(alpha: compact ? .42 : .7),
+              ),
+              borderRadius: BorderRadius.circular(compact ? 16 : 20),
+            ),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: CustomPaint(
+                    painter: _PipelineHosePainter(
+                      left: left,
+                      right: right,
+                      topY: topY,
+                      bottomY: bottomY,
+                      thickness: hoseWidth,
+                    ),
+                  ),
+                ),
+                for (var i = 0; i < topXs.length; i++)
+                  _station(
+                    index: i,
+                    x: topXs[i],
+                    y: topY,
+                    label: stages[i],
+                    above: true,
+                    nodeSize: nodeSize,
+                    arrowSize: arrowSize,
+                    fontSize: fontSize,
+                    labelHeight: labelHeight,
+                    labelTop: topLabelTop,
+                    cellWidth: topCell,
+                    clampedLeft: clampedLeft,
+                  ),
+                for (var i = 0; i < bottomXs.length; i++)
+                  _station(
+                    index: i + 4,
+                    x: bottomXs[i],
+                    y: bottomY,
+                    label: stages[i + 4],
+                    above: false,
+                    nodeSize: nodeSize,
+                    arrowSize: arrowSize,
+                    fontSize: fontSize,
+                    labelHeight: labelHeight,
+                    labelTop: bottomLabelTop,
+                    cellWidth: bottomCell,
+                    clampedLeft: clampedLeft,
+                  ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _station({
+    required int index,
+    required double x,
+    required double y,
+    required String label,
+    required bool above,
+    required double nodeSize,
+    required double arrowSize,
+    required double fontSize,
+    required double labelHeight,
+    required double labelTop,
+    required double cellWidth,
+    required double Function(double, double) clampedLeft,
+  }) =>
+      Stack(
+        children: [
+          Positioned(
+            left: x - nodeSize / 2,
+            top: y - nodeSize / 2,
+            child: Container(
+              width: nodeSize,
+              height: nodeSize,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const RadialGradient(
+                  center: Alignment(-.35, -.45),
+                  radius: .95,
+                  colors: [
+                    Color(0xFF2FAEB5),
+                    Color(0xFF0B5A61),
+                    Color(0xFF062E33),
+                    Color(0xFF021B1F),
+                  ],
+                  stops: [0, .34, .72, 1],
+                ),
+                border: Border.all(color: _gold, width: 1.4),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: .42),
+                    offset: Offset(0, nodeSize > 18 ? 3 : 2),
+                    blurRadius: nodeSize > 18 ? 7 : 4,
+                  ),
+                  BoxShadow(
+                    color: _gold.withValues(alpha: .28),
+                    blurRadius: nodeSize > 18 ? 10 : 5,
+                  ),
+                ],
+              ),
+              child: Text(
+                '${index + 1}',
+                style: GoogleFonts.orbitron(
+                  color: _gold,
+                  fontSize: nodeSize > 18 ? 8 : 6,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            left: x - arrowSize / 2,
+            top: above ? labelTop + labelHeight : y + nodeSize / 2 + 1,
+            child: Icon(
+              above ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
+              size: arrowSize,
+              color: _aqua.withValues(alpha: .95),
+            ),
+          ),
+          Positioned(
+            left: clampedLeft(x, cellWidth),
+            top: labelTop,
+            width: cellWidth,
+            height: labelHeight,
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.center,
+              style: (isArabic ? GoogleFonts.cairo() : GoogleFonts.inter())
+                  .copyWith(
+                color: Colors.white.withValues(alpha: .9),
+                fontSize: fontSize,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      );
+}
+
+class _PipelineHosePainter extends CustomPainter {
+  const _PipelineHosePainter({
+    required this.left,
+    required this.right,
+    required this.topY,
+    required this.bottomY,
+    required this.thickness,
+  });
+
+  final double left;
+  final double right;
+  final double topY;
+  final double bottomY;
+  final double thickness;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final turn = math.min((right - left) * .10, 28.0);
+    final radius = (bottomY - topY) / 2;
+    final path = Path()
+      ..moveTo(left, topY)
+      ..lineTo(right - turn, topY)
+      ..quadraticBezierTo(right, topY, right, topY + radius)
+      ..quadraticBezierTo(right, bottomY, right - turn, bottomY)
+      ..lineTo(left, bottomY);
+
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
+
+    canvas.save();
+    canvas.translate(0, math.max(3.0, thickness * .24));
+    paint
+      ..shader = null
+      ..color = Colors.black.withValues(alpha: .38)
+      ..strokeWidth = thickness + 9;
+    canvas.drawPath(path, paint);
+    canvas.restore();
+
+    paint
+      ..color = const Color(0xFF021B1F)
+      ..strokeWidth = thickness + 6;
+    canvas.drawPath(path, paint);
+
+    final bodyShader = LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: [
+        const Color(0xFF02262B),
+        const Color(0xFF0B6B72),
+        const Color(0xFF4EDCE2),
+        const Color(0xFF0A6D75),
+        const Color(0xFF022125),
+      ],
+      stops: [0, .20, .38, .68, 1],
+    ).createShader(
+      Rect.fromLTWH(
+        0,
+        topY - thickness,
+        size.width,
+        bottomY - topY + thickness * 2,
+      ),
+    );
+    paint
+      ..shader = bodyShader
+      ..strokeWidth = thickness + 2;
+    canvas.drawPath(path, paint);
+
+    paint
+      ..shader = null
+      ..color = Colors.black.withValues(alpha: .24)
+      ..strokeWidth = math.max(2.5, thickness * .32);
+    canvas.save();
+    canvas.translate(0, thickness * .24);
+    canvas.drawPath(path, paint);
+    canvas.restore();
+
+    paint
+      ..color = Colors.white.withValues(alpha: .38)
+      ..strokeWidth = math.max(2.0, thickness * .16);
+    canvas.save();
+    canvas.translate(0, -thickness * .24);
+    canvas.drawPath(path, paint);
+    canvas.restore();
+
+    _drawCap(canvas, left, topY);
+    _drawCap(canvas, left, bottomY);
+  }
+
+  void _drawCap(Canvas canvas, double x, double y) {
+    final rect = Rect.fromLTWH(
+      x - thickness * .32,
+      y - thickness * .58,
+      thickness * .64,
+      thickness * 1.16,
+    );
+    canvas.drawOval(
+      rect,
+      Paint()
+        ..color = const Color(0xFF021B1F)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+    canvas.drawOval(
+      rect.deflate(2),
+      Paint()
+        ..shader = const RadialGradient(
+          center: Alignment(-.4, -.5),
+          radius: .9,
+          colors: [
+            Color(0xFF52D8DE),
+            Color(0xFF0A626A),
+            Color(0xFF022125),
+          ],
+          stops: [0, .48, 1],
+        ).createShader(rect),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _PipelineHosePainter oldDelegate) =>
+      oldDelegate.left != left ||
+      oldDelegate.right != right ||
+      oldDelegate.topY != topY ||
+      oldDelegate.bottomY != bottomY ||
+      oldDelegate.thickness != thickness;
 }
 
 class _PhoneCluster extends StatelessWidget {
@@ -1275,8 +1800,8 @@ class _DesktopMobileCluster extends StatelessWidget {
         final height = constraints.maxHeight;
         final tall = wide && height > 180;
         final baseMonitorWidth = math.min(
-          width * .84,
-          (height * (tall ? .62 : .58)) * _desktopAspect + 12,
+          width * (tall ? .84 : .98),
+          (height * (tall ? .62 : 1.08)) * _desktopAspect + 12,
         );
         final baseMonitorHeight = (baseMonitorWidth - 12) / _desktopAspect + 34;
         final monitorWidth = baseMonitorWidth * (wide ? 1.3 : 1.0);
@@ -1290,10 +1815,10 @@ class _DesktopMobileCluster extends StatelessWidget {
           ),
           baseMonitorWidth * .28,
         );
-        final phoneWidth = basePhoneWidth * (tall ? 1.6 : 1.0);
+        final phoneWidth = basePhoneWidth * (tall ? 1.6 : 1.15);
         final phoneHeight = (phoneWidth - 10) / _mobileAspect + 10;
         final monitorLeft =
-            (width - monitorWidth) / 2 + width * (tall ? .03 : .08);
+            (width - monitorWidth) / 2 + width * (tall ? .03 : .04);
         final monitorTop = (height - monitorHeight) * (tall ? .42 : .5);
         final phoneLeft = tall
             ? math.max(0.0, monitorLeft - phoneWidth * .28)

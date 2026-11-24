@@ -1,4 +1,4 @@
-import '../models/experience_model.dart';
+﻿import '../models/experience_model.dart';
 import '../models/project_model.dart';
 import '../models/skill_model.dart';
 import '../utils/locale_provider.dart';
@@ -509,6 +509,11 @@ I have led university project teams as part of my academic work, coordinating ta
       emoji: '📈',
       gradientColors: [0xFF111827, 0xFF065f46],
       completionDate: '2025',
+      imageUrl: 'assets/images/Seven-Stage Data Pipeline Infographic.png',
+      featuredVisual: 'infographic',
+      featuredImages: [
+        'assets/images/Seven-Stage Data Pipeline Infographic.png',
+      ],
       liveUrl:
           'https://docs.google.com/spreadsheets/d/16ZONKqGDntWeHtt9qioxUlpQ2bSFLbrtKTM-2z3EQmA/edit?usp=sharing',
       detailedSections: [
@@ -534,6 +539,11 @@ I have led university project teams as part of my academic work, coordinating ta
       emoji: '🎙️',
       gradientColors: [0xFF1f2937, 0xFFb91c1c],
       completionDate: '2026',
+      imageUrl: 'assets/images/Libyan_dealect_Ai_voice.png',
+      featuredVisual: 'voice-overflow',
+      featuredImages: [
+        'assets/images/Libyan_dealect_Ai_voice.png',
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'إعداد البيانات',
@@ -563,10 +573,11 @@ I have led university project teams as part of my academic work, coordinating ta
       emoji: '🌐',
       gradientColors: [0xFF0f172a, 0xFF0ea5e9],
       completionDate: '2024',
-      featuredVisual: 'responsive',
+      imageUrl: 'assets/images/Tamayous_website.png',
+      featuredVisual: 'desktop-mobile',
       featuredImages: [
         'assets/images/Tamayous_website.png',
-        'assets/images/Tamayous_website.png',
+        'assets/images/Tamayous_website_mobile .png',
       ],
       detailedSections: [
         ProjectDetailSection(
@@ -597,6 +608,11 @@ I have led university project teams as part of my academic work, coordinating ta
       emoji: '📦',
       gradientColors: [0xFF111827, 0xFF7c2d12],
       completionDate: '2024',
+      imageUrl: 'assets/images/ERPNext.png',
+      featuredVisual: 'plain-image',
+      featuredImages: [
+        'assets/images/ERPNext.png',
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'التحليل الوظيفي',
@@ -924,6 +940,11 @@ I have led university project teams as part of my academic work, coordinating ta
       emoji: '📈',
       gradientColors: [0xFF111827, 0xFF065f46],
       completionDate: '2025',
+      imageUrl: 'assets/images/Seven-Stage Data Pipeline Infographic.png',
+      featuredVisual: 'infographic',
+      featuredImages: [
+        'assets/images/Seven-Stage Data Pipeline Infographic.png',
+      ],
       liveUrl:
           'https://docs.google.com/spreadsheets/d/16ZONKqGDntWeHtt9qioxUlpQ2bSFLbrtKTM-2z3EQmA/edit?usp=sharing',
       detailedSections: [
@@ -949,6 +970,11 @@ I have led university project teams as part of my academic work, coordinating ta
       emoji: '🎙️',
       gradientColors: [0xFF1f2937, 0xFFb91c1c],
       completionDate: '2026',
+      imageUrl: 'assets/images/Libyan_dealect_Ai_voice.png',
+      featuredVisual: 'voice-overflow',
+      featuredImages: [
+        'assets/images/Libyan_dealect_Ai_voice.png',
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'Dataset Preparation',
@@ -978,10 +1004,11 @@ I have led university project teams as part of my academic work, coordinating ta
       emoji: '🌐',
       gradientColors: [0xFF0f172a, 0xFF0ea5e9],
       completionDate: '2024',
-      featuredVisual: 'responsive',
+      imageUrl: 'assets/images/Tamayous_website.png',
+      featuredVisual: 'desktop-mobile',
       featuredImages: [
         'assets/images/Tamayous_website.png',
-        'assets/images/Tamayous_website.png',
+        'assets/images/Tamayous_website_mobile .png',
       ],
       detailedSections: [
         ProjectDetailSection(
@@ -1012,6 +1039,11 @@ I have led university project teams as part of my academic work, coordinating ta
       emoji: '📦',
       gradientColors: [0xFF111827, 0xFF7c2d12],
       completionDate: '2024',
+      imageUrl: 'assets/images/ERPNext.png',
+      featuredVisual: 'plain-image',
+      featuredImages: [
+        'assets/images/ERPNext.png',
+      ],
       detailedSections: [
         ProjectDetailSection(
           title: 'Operational Analysis',

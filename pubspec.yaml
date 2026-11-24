@@ -74,6 +74,10 @@ flutter:
   assets:
     - assets/images/Linkedin_logo.webp
     - assets/images/Moneeb.png
+    - assets/images/ERPNext.png
+    - assets/images/Libyan_dealect_Ai_voice.png
+    - "assets/images/Seven-Stage Data Pipeline Infographic.png"
+    - "assets/images/Tamayous_website_mobile .png"
     - assets/images/doctor_leandek_hero.webp
     - assets/images/doctor_leandek_home.webp
     - assets/images/doctor_leandek_services.webp
@@ -86,6 +90,9 @@ flutter:
     - assets/images/optimized/custom_software_800.webp
     - assets/images/optimized/doctor_leandek_login_400.webp
     - assets/images/optimized/doctor_leandek_main_387.webp
+    - assets/images/optimized/erpnext_512.webp
+    - assets/images/optimized/libyan_voice_512.webp
+    - assets/images/optimized/lead_pipeline_1200.webp
     - assets/images/optimized/feedme_account_430.webp
     - assets/images/optimized/feedme_cart_430.webp
     - assets/images/optimized/feedme_login_430.webp
@@ -111,6 +118,7 @@ flutter:
     - assets/images/optimized/smart-clinic-800.webp
     - assets/images/optimized/supabase_logo_96.webp
     - assets/images/optimized/tamayous_1200.webp
+    - assets/images/optimized/tamayous_mobile_400.webp
     - assets/images/optimized/torrance_desktop_1200.webp
     - assets/images/optimized/torrance_mobile_400.webp
 

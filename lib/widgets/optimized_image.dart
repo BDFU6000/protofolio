@@ -38,6 +38,13 @@ class OptimizedAssetRegistry {
         'assets/images/optimized/torrance_mobile_400.webp',
     'assets/images/Tamayous_website.png':
         'assets/images/optimized/tamayous_1200.webp',
+    'assets/images/Tamayous_website_mobile .png':
+        'assets/images/optimized/tamayous_mobile_400.webp',
+    'assets/images/ERPNext.png': 'assets/images/optimized/erpnext_512.webp',
+    'assets/images/Libyan_dealect_Ai_voice.png':
+        'assets/images/optimized/libyan_voice_512.webp',
+    'assets/images/Seven-Stage Data Pipeline Infographic.png':
+        'assets/images/optimized/lead_pipeline_1200.webp',
     'assets/images/My_roadmap.png':
         'assets/images/optimized/my_roadmap_800.webp',
     'assets/images/Custom Software Development.png':
@@ -131,6 +138,8 @@ class _OptimizedImageState extends State<OptimizedImage> {
   bool _shouldLoad = false;
   bool _precached = false;
   bool _frameCheckRegistered = false;
+  bool _loadPending = false;
+  final ValueNotifier<bool> _loaded = ValueNotifier<bool>(false);
   ScrollPosition? _scrollPosition;
 
   @override
@@ -154,6 +163,8 @@ class _OptimizedImageState extends State<OptimizedImage> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.assetName != widget.assetName) {
       _precached = false;
+      _loadPending = false;
+      _loaded.value = false;
     }
     if (oldWidget.lazy != widget.lazy && !widget.lazy && !_shouldLoad) {
       setState(() => _shouldLoad = true);
@@ -168,7 +179,17 @@ class _OptimizedImageState extends State<OptimizedImage> {
   void dispose() {
     _scrollPosition?.removeListener(_onScroll);
     _unregisterFrameCheck();
+    _loaded.dispose();
     super.dispose();
+  }
+
+  void _markLoaded() {
+    if (_loaded.value || _loadPending) return;
+    _loadPending = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadPending = false;
+      if (mounted && !_loaded.value) _loaded.value = true;
+    });
   }
 
   void _registerFrameCheck() {
@@ -250,12 +271,23 @@ class _OptimizedImageState extends State<OptimizedImage> {
             ? null
             : (widget.height! * ratio).round());
 
-    Widget placeholder = ColoredBox(
-      color: widget.placeholderColor,
-      child: Center(
-        child: Opacity(
-          opacity: .16,
-          child: Icon(widget.placeholderIcon, color: Colors.white, size: 22),
+    Widget placeholder = ValueListenableBuilder<bool>(
+      valueListenable: _loaded,
+      builder: (context, loaded, child) {
+        return AnimatedOpacity(
+          opacity: loaded ? 0 : 1,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          child: child,
+        );
+      },
+      child: ColoredBox(
+        color: widget.placeholderColor,
+        child: Center(
+          child: Opacity(
+            opacity: .16,
+            child: Icon(widget.placeholderIcon, color: Colors.white, size: 22),
+          ),
         ),
       ),
     );
@@ -280,8 +312,10 @@ class _OptimizedImageState extends State<OptimizedImage> {
         ),
       ),
       frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        final loaded = wasSynchronouslyLoaded || frame != null;
+        if (loaded) _markLoaded();
         return AnimatedOpacity(
-          opacity: wasSynchronouslyLoaded || frame != null ? 1 : 0,
+          opacity: loaded ? 1 : 0,
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeOut,
           child: child,
