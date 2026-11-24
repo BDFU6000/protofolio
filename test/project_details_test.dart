@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:my_protofolio/data/portfolio_data.dart';
 import 'package:my_protofolio/screens/project_details_screen.dart';
@@ -144,6 +145,35 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Tamayoz details pixel-fit its website frames',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 900);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    final project = PortfolioData.englishProjects.firstWhere(
+      (item) => item.emoji == '🌐',
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(home: ProjectDetailsScreen(project: project)),
+    );
+    await tester.pumpAndSettle();
+
+    _expectFirstImageAspect(
+      tester,
+      'assets/images/Tamayous_website.png',
+      1805 / 947,
+    );
+    _expectFirstImageAspect(
+      tester,
+      'assets/images/Tamayous_website_mobile .png',
+      387 / 860,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Arabic details use Arabic specification copy',
       (WidgetTester tester) async {
     LocaleProvider.isArabic.value = true;
@@ -200,4 +230,30 @@ Finder _assetFinder(String assetName) {
     (widget) => _assetNameOf(widget) == resolved,
     skipOffstage: false,
   );
+}
+
+void _expectFirstImageAspect(
+  WidgetTester tester,
+  String assetName,
+  double expectedAspect,
+) {
+  final finder = _assetFinder(assetName);
+  expect(finder, findsWidgets);
+
+  RenderImage? renderImage;
+  void collectRenderImage(RenderObject object) {
+    if (object is RenderImage) {
+      renderImage ??= object;
+      return;
+    }
+    object.visitChildren(collectRenderImage);
+  }
+
+  collectRenderImage(finder.evaluate().first.renderObject!);
+  expect(renderImage, isNotNull);
+
+  final size = renderImage!.size;
+  expect(size.width, greaterThan(0));
+  expect(size.height, greaterThan(0));
+  expect(size.width / size.height, closeTo(expectedAspect, 0.001));
 }

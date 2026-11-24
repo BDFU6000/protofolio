@@ -473,13 +473,30 @@ class _WebsiteStage extends StatelessWidget {
   final double width;
   final double height;
 
+  static const _desktopAspect = 1805 / 947;
+  static const _mobileAspect = 387 / 860;
+  static const _browserBorderWidth = 1.0;
+  static const _browserToolbarHeight = 38.0;
+  static const _browserViewportPadding = 8.0;
+
   @override
   Widget build(BuildContext context) {
-    final browserHeight = math.min(height * .84, (width * .9) / 1.6 + 38);
-    final browserWidth = (browserHeight - 38) * 1.6;
+    final horizontalInset =
+        _browserBorderWidth * 2 + _browserViewportPadding * 2;
+    final verticalInset = horizontalInset + _browserToolbarHeight;
+    final maxViewportWidth = math.max(0.0, width * .9 - horizontalInset);
+    final viewportHeight = math.max(
+      0.0,
+      math.min(
+        height * .84 - verticalInset,
+        maxViewportWidth / _desktopAspect,
+      ),
+    );
+    final browserHeight = viewportHeight + verticalInset;
+    final browserWidth = viewportHeight * _desktopAspect + horizontalInset;
     final browserLeft = math.max(0.0, (width - browserWidth) / 2 + width * .05);
     final phoneHeight = browserHeight * .60;
-    final phoneWidth = (phoneHeight - 10) * (345 / 723) + 10;
+    final phoneWidth = (phoneHeight - 10) * _mobileAspect + 10;
 
     return SizedBox(
       width: width,

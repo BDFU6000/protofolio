@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -30,6 +31,252 @@ void main() {
     await tester.pump(const Duration(milliseconds: 450));
 
     expect(find.text('Sidaliti'), findsWidgets);
+    expect(find.text('02 / 10'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('mouse wheel advances the coverflow without scrolling the page',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final pageController = ScrollController();
+    addTearDown(pageController.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            controller: pageController,
+            child: const ProjectsSection(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final center = tester.getCenter(
+      find.byKey(const Key('featured-coverflow-stage')),
+    );
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(pointer.hover(center));
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 120)));
+    await tester.pumpAndSettle();
+
+    expect(find.text('02 / 10'), findsOneWidget);
+    expect(pageController.offset, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('vertical drag advances the coverflow without scrolling the page',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(400, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final pageController = ScrollController();
+    addTearDown(pageController.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            controller: pageController,
+            child: const ProjectsSection(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final center = tester.getCenter(
+      find.byKey(const Key('featured-coverflow-stage')),
+    );
+    await tester.dragFrom(center, const Offset(0, -120));
+    await tester.pumpAndSettle();
+
+    expect(find.text('02 / 10'), findsOneWidget);
+    expect(pageController.offset, 0);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('wheel at the last project lets the page continue scrolling',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final pageController = ScrollController();
+    addTearDown(pageController.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            controller: pageController,
+            child: const ProjectsSection(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Project 10'));
+    await tester.pumpAndSettle();
+
+    final center = tester.getCenter(
+      find.byKey(const Key('featured-coverflow-stage')),
+    );
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(pointer.hover(center));
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 120)));
+    await tester.pumpAndSettle();
+
+    expect(find.text('10 / 10'), findsOneWidget);
+    expect(pageController.offset, greaterThan(0));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('downward drag at first project lets the page continue scrolling',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(400, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final pageController = ScrollController();
+    addTearDown(pageController.dispose);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(
+            controller: pageController,
+            child: const ProjectsSection(),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final center = tester.getCenter(
+      find.byKey(const Key('featured-coverflow-stage')),
+    );
+    await tester.dragFrom(center, const Offset(0, 120));
+    await tester.pumpAndSettle();
+
+    expect(find.text('01 / 10'), findsOneWidget);
+    expect(pageController.offset, greaterThan(0));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('adjacent coverflow cards do not overlap the active card',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: ProjectsSection()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    Rect cardRect(int index) => tester.getRect(
+          find
+              .descendant(
+                of: find.byKey(Key('featured-card-$index')),
+                matching: find.byType(Material),
+              )
+              .first,
+        );
+
+    final activeRect = cardRect(0);
+    final nextRect = cardRect(1);
+
+    expect(nextRect.left, greaterThan(activeRect.right));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('progress indicators jump directly to a project',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: ProjectsSection()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.bySemanticsLabel('Project 4'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('04 / 10'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('adjacent cards sit left and right at different depths',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(body: ProjectsSection()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    Offset faceCenter(int index) {
+      final transform = tester.widget<Transform>(
+        find
+            .descendant(
+              of: find.byKey(Key('featured-card-$index')),
+              matching: find.byType(Transform),
+            )
+            .first,
+      );
+      return MatrixUtils.transformPoint(transform.transform, Offset.zero);
+    }
+
+    final activeCenter = faceCenter(0);
+    final nextCenter = faceCenter(1);
+    final previousCenter = faceCenter(9);
+
+    expect(nextCenter.dx, greaterThan(activeCenter.dx + 20));
+    expect(previousCenter.dx, lessThan(activeCenter.dx - 20));
+    expect(nextCenter.distance, greaterThan(activeCenter.distance));
+    expect(previousCenter.distance, greaterThan(activeCenter.distance));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('reduced motion still navigates the coverflow',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(disableAnimations: true),
+        child: const MaterialApp(
+          home: Scaffold(body: ProjectsSection()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip('Next project'));
+    await tester.pumpAndSettle();
+
     expect(find.text('02 / 10'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
@@ -200,6 +447,40 @@ void main() {
     final finder = _assetFinder('assets/images/Tamayous_website.png');
     expect(finder, findsOneWidget);
     expect(tester.getSize(finder).width, greaterThan(170));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Tamayoz screenshots pixel-fit their PC and phone frames',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(child: ProjectsSection()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    for (var index = 0; index < 6; index++) {
+      await tester.tap(find.byTooltip('Next project'));
+      await tester.pumpAndSettle();
+    }
+
+    _expectImageAspect(
+      tester,
+      'assets/images/Tamayous_website.png',
+      1805 / 947,
+    );
+    _expectImageAspect(
+      tester,
+      'assets/images/Tamayous_website_mobile .png',
+      387 / 860,
+    );
     expect(tester.takeException(), isNull);
   });
 

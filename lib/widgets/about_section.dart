@@ -321,7 +321,9 @@ class _PortraitComposition extends StatelessWidget {
             children: [
               Positioned.fill(child: CustomPaint(painter: _TechOrbitPainter())),
               Positioned(
-                right: 0,
+                left:
+                    compact ? (constraints.maxWidth - portraitSize) / 2 : null,
+                right: compact ? null : 0,
                 top: 0,
                 bottom: 0,
                 width: portraitSize,

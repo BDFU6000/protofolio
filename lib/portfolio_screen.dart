@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'data/portfolio_data.dart';
 import 'utils/locale_provider.dart';
 import 'utils/responsive_helper.dart';
+import 'utils/theme_provider.dart';
 import 'widgets/about_section.dart';
 import 'widgets/contact_section.dart';
 import 'widgets/experience_section.dart';
@@ -96,60 +97,101 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
       endDrawer: ValueListenableBuilder<bool>(
         valueListenable: LocaleProvider.isArabic,
         builder: (context, isArabic, _) {
+          const gold = Color(0xFFFFC900);
+          const goldLight = Color(0xFFFFD83D);
+          const aqua = Color(0xFF62DADD);
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          final initials = PortfolioData.name
+              .split(' ')
+              .where((word) => word.isNotEmpty)
+              .map((word) => word[0])
+              .take(2)
+              .join();
+
           return Drawer(
-            backgroundColor: const Color(0xFF0D1321),
+            backgroundColor: const Color(0xFF032D32),
             child: Container(
               decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [
+                    Color(0xFF022B30),
+                    Color(0xFF06454A),
+                    Color(0xFF032D32),
+                  ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  stops: [0, .55, 1],
+                ),
                 border: Border(
                   left: isArabic
-                      ? BorderSide(
-                          color: const Color(0xFF00D4FF).withOpacity(0.1))
+                      ? BorderSide(color: gold.withValues(alpha: .18))
                       : BorderSide.none,
                   right: !isArabic
-                      ? BorderSide(
-                          color: const Color(0xFF00D4FF).withOpacity(0.1))
+                      ? BorderSide(color: aqua.withValues(alpha: .18))
                       : BorderSide.none,
                 ),
               ),
               child: SafeArea(
                 child: Column(
                   children: [
-                    // Drawer Header with Close Button
                     Padding(
-                      padding: const EdgeInsets.all(24.0),
+                      padding: const EdgeInsets.fromLTRB(20, 20, 12, 18),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 36,
-                                height: 36,
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(colors: [
-                                    Color(0xFF00D4FF),
-                                    Color(0xFF7B2FFF)
-                                  ]),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    PortfolioData.name
-                                        .split(' ')
-                                        .where((w) => w.isNotEmpty)
-                                        .map((w) => w[0])
-                                        .take(2)
-                                        .join(),
-                                    style: GoogleFonts.poppins(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14),
-                                  ),
-                                ),
+                          Container(
+                            width: 44,
+                            height: 44,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [gold, goldLight],
                               ),
-                            ],
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Center(
+                              child: Text(
+                                initials,
+                                style: (isArabic
+                                        ? GoogleFonts.cairo
+                                        : GoogleFonts.playfairDisplay)(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15,
+                                    letterSpacing: 1.2),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isArabic ? 'القائمة' : 'MENU',
+                                  style: (isArabic
+                                          ? GoogleFonts.cairo
+                                          : GoogleFonts.orbitron)(
+                                      color: gold,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 10,
+                                      letterSpacing: isArabic ? 0 : 3),
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  PortfolioData.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: (isArabic
+                                          ? GoogleFonts.cairo
+                                          : GoogleFonts.playfairDisplay)(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14),
+                                ),
+                              ],
+                            ),
                           ),
                           IconButton(
+                            tooltip: isArabic ? 'إغلاق' : 'Close menu',
                             icon: const Icon(Icons.close_rounded,
                                 color: Colors.white70),
                             onPressed: () => Navigator.of(context).pop(),
@@ -157,120 +199,199 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                         ],
                       ),
                     ),
-                    const Divider(color: Colors.white10, height: 1),
-                    const SizedBox(height: 16),
-                    // Navigation links
+                    Divider(
+                      height: 1,
+                      color: gold.withValues(alpha: .18),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 18, 24, 8),
+                      child: Text(
+                        isArabic ? 'التنقل' : 'Navigation',
+                        style: (isArabic ? GoogleFonts.cairo : GoogleFonts.inter)(
+                          color: aqua.withValues(alpha: .85),
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                          letterSpacing: isArabic ? 0 : 2.4,
+                        ),
+                      ),
+                    ),
                     Expanded(
-                      child: ListView.builder(
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
                         itemCount: PortfolioData.navItems.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 8),
                         itemBuilder: (context, i) {
                           final isActive = _activeSection == i;
-                          return ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 24, vertical: 4),
-                            title: Text(
-                              PortfolioData.navItems[i],
-                              style: GoogleFonts.inter(
+                          return AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? gold.withValues(alpha: .12)
+                                  : Colors.white.withValues(alpha: .04),
+                              border: Border.all(
                                 color: isActive
-                                    ? const Color(0xFF00D4FF)
-                                    : Colors.white70,
-                                fontWeight: isActive
-                                    ? FontWeight.w600
-                                    : FontWeight.w400,
-                                fontSize: 16,
+                                    ? gold.withValues(alpha: .5)
+                                    : Colors.white.withValues(alpha: .08),
+                              ),
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: InkWell(
+                              borderRadius: BorderRadius.circular(14),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                _scrollToSection(i);
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 14, vertical: 13),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 4,
+                                      height: 22,
+                                      decoration: BoxDecoration(
+                                        color: isActive
+                                            ? gold
+                                            : Colors.transparent,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        PortfolioData.navItems[i],
+                                        style: (isArabic
+                                                ? GoogleFonts.cairo
+                                                : GoogleFonts.inter)(
+                                            color: isActive
+                                                ? gold
+                                                : Colors.white.withValues(
+                                                    alpha: .78),
+                                            fontWeight: isActive
+                                                ? FontWeight.w600
+                                                : FontWeight.w500,
+                                            fontSize: 14),
+                                      ),
+                                    ),
+                                    Icon(
+                                      isActive
+                                          ? Icons.arrow_forward_rounded
+                                          : Icons.chevron_right_rounded,
+                                      size: 16,
+                                      color: isActive
+                                          ? gold
+                                          : Colors.white.withValues(alpha: .38),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                            leading: Container(
-                              width: 6,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                color: isActive
-                                    ? const Color(0xFF00D4FF)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(3),
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.of(context).pop(); // Close drawer
-                              _scrollToSection(i);
-                            },
                           );
                         },
                       ),
                     ),
-                    // Language toggle and Hire Me in the bottom
                     Padding(
-                      padding: const EdgeInsets.all(24.0),
+                      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
                       child: Column(
                         children: [
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                isArabic ? 'اللغة' : 'Language',
-                                style: GoogleFonts.inter(
-                                    color: Colors.white38, fontSize: 14),
+                              Expanded(
+                                child: InkWell(
+                                  onTap: LocaleProvider.toggle,
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    constraints: const BoxConstraints(
+                                        minHeight: AppLayout.minTouchTarget),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withValues(alpha: .06),
+                                      border: Border.all(
+                                          color:
+                                              Colors.white.withValues(alpha: .14)),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(Icons.language,
+                                            size: 16, color: gold),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          isArabic ? 'EN' : 'عربي',
+                                          style: (isArabic
+                                                  ? GoogleFonts.cairo
+                                                  : GoogleFonts.inter)(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.w600,
+                                              fontSize: 12),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                               ),
+                              const SizedBox(width: 10),
                               InkWell(
-                                onTap: () {
-                                  LocaleProvider.toggle();
-                                },
+                                onTap: ThemeProvider.toggle,
                                 borderRadius: BorderRadius.circular(20),
                                 child: Container(
-                                  constraints: const BoxConstraints(
-                                      minHeight: AppLayout.minTouchTarget),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 12),
+                                  width: AppLayout.minTouchTarget,
+                                  height: AppLayout.minTouchTarget,
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.05),
+                                    color: Colors.white.withValues(alpha: .06),
                                     border: Border.all(
-                                        color: Colors.white.withOpacity(0.1)),
+                                        color:
+                                            Colors.white.withValues(alpha: .14)),
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.language,
-                                          size: 16, color: Colors.white),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        isArabic ? 'EN' : 'عربي',
-                                        style: GoogleFonts.inter(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 12),
-                                      ),
-                                    ],
+                                  child: Icon(
+                                    isDark
+                                        ? Icons.light_mode_outlined
+                                        : Icons.dark_mode_outlined,
+                                    color: gold,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
-                          GestureDetector(
+                          const SizedBox(height: 16),
+                          InkWell(
                             onTap: () {
                               Navigator.of(context).pop();
                               _scrollToSection(
                                   PortfolioData.navItems.length - 1);
                             },
+                            borderRadius: BorderRadius.circular(12),
                             child: Container(
                               width: double.infinity,
                               constraints: const BoxConstraints(
                                   minHeight: AppLayout.minTouchTarget),
-                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 14),
                               decoration: BoxDecoration(
-                                gradient: const LinearGradient(colors: [
-                                  Color(0xFF00D4FF),
-                                  Color(0xFF7B2FFF)
-                                ]),
+                                gradient: const LinearGradient(
+                                  colors: [gold, goldLight],
+                                ),
                                 borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: gold.withValues(alpha: .24),
+                                    blurRadius: 18,
+                                  ),
+                                ],
                               ),
                               child: Center(
                                 child: Text(
                                   isArabic ? 'وظفني' : 'Hire Me',
-                                  style: GoogleFonts.poppins(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 15),
+                                  style: (isArabic
+                                          ? GoogleFonts.cairo
+                                          : GoogleFonts.inter)(
+                                      color: const Color(0xFF17383A),
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 13,
+                                      letterSpacing: isArabic ? 0 : 2.2),
                                 ),
                               ),
                             ),
@@ -363,7 +484,10 @@ class _PortfolioScreenState extends State<PortfolioScreen> {
                           ),
                           Container(
                             key: _sectionKeys[6],
-                            child: const ContactSection(),
+                            child: ContactSection(
+                              onNavigate: _scrollToSection,
+                              onBackToTop: () => _scrollToSection(0),
+                            ),
                           ),
                         ],
                       ),

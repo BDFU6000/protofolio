@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'dart:ui' show ImageFilter;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -20,41 +21,120 @@ class ProjectsSection extends StatefulWidget {
 
 class _ProjectsSectionState extends State<ProjectsSection> {
   static const _aqua = Color(0xFF52D8DE);
+  static const _wheelThreshold = 28.0;
+  static const _dragThreshold = 48.0;
+  static const _navigationCooldown = Duration(milliseconds: 420);
+
+  static double relativePosition(double index, double position, int count) {
+    var relative = index - (position % count);
+    if (relative > count / 2) relative -= count;
+    if (relative < -count / 2) relative += count;
+    return relative;
+  }
+
   int _activeIndex = 0;
+  double _position = 0;
+  double _wheelDelta = 0;
+  double _dragDelta = 0;
+  bool _dragHandled = false;
+  DateTime? _lastWheelNavigation;
 
   void _move(int delta, int count) {
     if (count == 0) return;
-    setState(() => _activeIndex = (_activeIndex + delta + count) % count);
+    setState(() {
+      _position += delta;
+      _activeIndex = (_activeIndex + delta + count) % count;
+    });
   }
 
-  Widget _buildPositionedCard({
+  void _goTo(int index, int count) {
+    if (count == 0 || index == _activeIndex) return;
+    var delta = index - _activeIndex;
+    if (delta > count ~/ 2) delta -= count;
+    if (delta < -(count ~/ 2)) delta += count;
+    setState(() {
+      _position += delta;
+      _activeIndex = index;
+    });
+  }
+
+  void _handleWheel(PointerScrollEvent event, int count) {
+    GestureBinding.instance.pointerSignalResolver.register(event, (_) {
+      final delta = event.scrollDelta.dy;
+      if (delta == 0) return;
+      if (_wheelDelta != 0 && (_wheelDelta > 0) != (delta > 0)) {
+        _wheelDelta = 0;
+      }
+      _wheelDelta += delta;
+      final now = DateTime.now();
+      final last = _lastWheelNavigation;
+      if (_wheelDelta.abs() < _wheelThreshold ||
+          (last != null && now.difference(last) < _navigationCooldown)) {
+        return;
+      }
+      _move(_wheelDelta > 0 ? 1 : -1, count);
+      _wheelDelta = 0;
+      _lastWheelNavigation = now;
+    });
+  }
+
+  void _startDrag() {
+    _dragDelta = 0;
+    _dragHandled = false;
+    _wheelDelta = 0;
+  }
+
+  void _updateDrag(DragUpdateDetails details, int count) {
+    _dragDelta -= details.delta.dy;
+    if (_dragHandled || _dragDelta.abs() < _dragThreshold) return;
+    _move(_dragDelta > 0 ? 1 : -1, count);
+    _dragHandled = true;
+  }
+
+  Widget _buildCoverflowCard({
+    required int index,
+    required int count,
     required ProjectModel project,
     required bool isArabic,
+    required double animatedPosition,
+    required double stageWidth,
     required double cardWidth,
     required double cardHeight,
-    required double left,
     required double top,
-    required double rotation,
-    required bool active,
-    required VoidCallback onTap,
-  }) =>
-      _CarouselCardPosition(
-        key: ValueKey(project.title),
-        width: cardWidth,
-        height: cardHeight,
-        left: left,
-        top: top,
-        rotation: rotation,
-        active: active,
-        onTap: onTap,
-        child: _FeaturedProjectCard(
-          project: project,
-          isArabic: isArabic,
-          onOpen: onTap,
-          compact: !active,
-          active: active,
+    required double step,
+    required double depthStep,
+    required double perspective,
+  }) {
+    final relative =
+        relativePosition(index.toDouble(), animatedPosition, count);
+    final active = index == _activeIndex;
+    return Positioned(
+      left: (stageWidth - cardWidth) / 2,
+      top: top,
+      width: cardWidth,
+      height: cardHeight,
+      child: Visibility(
+        visible: relative.abs() <= 3.2,
+        maintainState: true,
+        child: _CoverflowCard(
+          key: ValueKey('featured-card-$index'),
+          relative: relative,
+          step: step,
+          depthStep: depthStep,
+          perspective: perspective,
+          onTap:
+              active ? () => _openProject(project) : () => _goTo(index, count),
+          child: _FeaturedProjectCard(
+            project: project,
+            isArabic: isArabic,
+            onOpen: () => _openProject(project),
+            compact: !active,
+            active: active,
+          ),
         ),
-      );
+      ),
+    );
+  }
 
   void _openProject(ProjectModel project) {
     Navigator.of(context).push(
@@ -247,8 +327,18 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                           isPhone ? 470.0 : (width < 600 ? 455.0 : 350.0);
                       final topInset = 64.0;
                       final bottomInset = 52.0;
-                      final sideOffset = cardWidth * (width < 600 ? .88 : .91);
-                      final sideWidth = cardWidth * .72;
+                      final step = cardWidth *
+                          (isPhone ? 1.02 : (width < 600 ? .82 : .68));
+                      final depthStep = isPhone ? 48.0 : 72.0;
+                      final perspective = isPhone ? .0016 : .0012;
+                      final reduceMotion =
+                          MediaQuery.disableAnimationsOf(context);
+                      final duration = Duration(
+                        milliseconds: reduceMotion ? 0 : 720,
+                      );
+                      final dotDuration = Duration(
+                        milliseconds: reduceMotion ? 0 : 300,
+                      );
                       if (projects.isEmpty) {
                         return Padding(
                           padding: const EdgeInsets.symmetric(
@@ -269,118 +359,177 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                           ),
                         );
                       }
-                      final leftProject = (_activeIndex - 1 + projects.length) %
-                          projects.length;
-                      final rightProject = (_activeIndex + 1) % projects.length;
-                      final cardWidgets = <Widget>[
-                        if (!isPhone && projects.length > 1)
-                          _buildPositionedCard(
-                            project: projects[leftProject],
-                            isArabic: isArabic,
-                            cardWidth: sideWidth,
-                            cardHeight: cardHeight * .86,
-                            left: (width - sideWidth) / 2 - sideOffset,
-                            top: topInset + 18,
-                            rotation: -.14,
-                            active: false,
-                            onTap: () => _move(-1, projects.length),
-                          ),
-                        if (!isPhone && projects.length > 2)
-                          _buildPositionedCard(
-                            project: projects[rightProject],
-                            isArabic: isArabic,
-                            cardWidth: sideWidth,
-                            cardHeight: cardHeight * .86,
-                            left: (width - sideWidth) / 2 + sideOffset,
-                            top: topInset + 18,
-                            rotation: .14,
-                            active: false,
-                            onTap: () => _move(1, projects.length),
-                          ),
-                        _buildPositionedCard(
-                          project: projects[_activeIndex],
-                          isArabic: isArabic,
-                          cardWidth: cardWidth,
-                          cardHeight: cardHeight,
-                          left: (width - cardWidth) / 2,
-                          top: topInset,
-                          rotation: 0,
-                          active: true,
-                          onTap: () => _openProject(projects[_activeIndex]),
-                        ),
-                      ];
 
-                      return GestureDetector(
-                        onHorizontalDragEnd: (details) {
-                          final velocity = details.primaryVelocity ?? 0;
-                          if (velocity.abs() > 100) {
-                            _move(velocity < 0 ? 1 : -1, projects.length);
+                      return Listener(
+                        onPointerSignal: (event) {
+                          if (event is PointerScrollEvent) {
+                            _handleWheel(event, projects.length);
                           }
                         },
-                        child: ClipRect(
-                          clipper: const _HorizontalViewportClipper(360),
-                          child: SizedBox(
-                            width: width,
-                            height: topInset + cardHeight + bottomInset,
-                            child: Stack(
-                              alignment: Alignment.topCenter,
-                              children: [
-                                ...cardWidgets,
-                                Positioned(
-                                  bottom: 0,
-                                  left: 0,
-                                  right: 0,
-                                  child: Center(
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: List.generate(projects.length,
-                                            (index) {
-                                          final selected =
-                                              index == _activeIndex;
-                                          return Semantics(
-                                            button: true,
-                                            label: isArabic
-                                                ? '\u0627\u0644\u0645\u0634\u0631\u0648\u0639 ${index + 1}'
-                                                : 'Project ${index + 1}',
-                                            child: SizedBox(
-                                              width: AppLayout.minTouchTarget,
-                                              height: AppLayout.minTouchTarget,
-                                              child: InkWell(
-                                                onTap: () => setState(
-                                                    () => _activeIndex = index),
-                                                borderRadius:
-                                                    BorderRadius.circular(24),
-                                                child: Center(
-                                                  child: AnimatedContainer(
-                                                    duration: const Duration(
-                                                        milliseconds: 300),
-                                                    width: selected ? 18 : 10,
-                                                    height: 10,
-                                                    decoration: BoxDecoration(
-                                                      color: selected
-                                                          ? const Color
-                                                              .fromARGB(
-                                                              255, 132, 105, 7)
-                                                          : _aqua.withValues(
-                                                              alpha: .85),
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onVerticalDragStart: (_) => _startDrag(),
+                          onVerticalDragUpdate: (details) =>
+                              _updateDrag(details, projects.length),
+                          onVerticalDragEnd: (_) {
+                            _dragDelta = 0;
+                            _dragHandled = false;
+                          },
+                          onHorizontalDragEnd: (details) {
+                            final velocity = details.primaryVelocity ?? 0;
+                            if (velocity.abs() > 100) {
+                              _move(velocity < 0 ? 1 : -1, projects.length);
+                            }
+                          },
+                          child: TweenAnimationBuilder<double>(
+                            tween: Tween<double>(begin: 0, end: _position),
+                            duration: duration,
+                            curve: Curves.easeInOutCubic,
+                            builder: (context, animatedPosition, _) {
+                              final cardOrder = List<int>.generate(
+                                  projects.length, (index) => index)
+                                ..sort((a, b) {
+                                  final aDepth = relativePosition(a.toDouble(),
+                                          animatedPosition, projects.length)
+                                      .abs();
+                                  final bDepth = relativePosition(b.toDouble(),
+                                          animatedPosition, projects.length)
+                                      .abs();
+                                  return bDepth.compareTo(aDepth);
+                                });
+                              final cards = cardOrder.map((index) {
+                                return _buildCoverflowCard(
+                                  index: index,
+                                  count: projects.length,
+                                  project: projects[index],
+                                  isArabic: isArabic,
+                                  animatedPosition: animatedPosition,
+                                  stageWidth: width,
+                                  cardWidth: cardWidth,
+                                  cardHeight: cardHeight,
+                                  top: topInset,
+                                  step: step,
+                                  depthStep: depthStep,
+                                  perspective: perspective,
+                                );
+                              }).toList();
+
+                              return ClipRect(
+                                clipper: const _HorizontalViewportClipper(360),
+                                child: SizedBox(
+                                  key: const Key('featured-coverflow-stage'),
+                                  width: width,
+                                  height: topInset + cardHeight + bottomInset,
+                                  child: Stack(
+                                    alignment: Alignment.topCenter,
+                                    children: [
+                                      Positioned.fill(
+                                        child: DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            gradient: RadialGradient(
+                                              center: Alignment.center,
+                                              radius: isPhone ? .9 : .7,
+                                              colors: [
+                                                const Color(0x2338C9CE),
+                                                const Color(0x0A06383D),
+                                                Colors.transparent,
+                                              ],
+                                              stops: const [0, .55, 1],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        left: (width - cardWidth) / 2 - 24,
+                                        top: topInset - 24,
+                                        width: cardWidth + 48,
+                                        height: cardHeight + 48,
+                                        child: DecoratedBox(
+                                          decoration: BoxDecoration(
+                                            color: const Color(0x0AFFC800),
+                                            borderRadius:
+                                                BorderRadius.circular(42),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Color(0x2AFFC800),
+                                                blurRadius: 54,
+                                                spreadRadius: 12,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      ...cards,
+                                      Positioned(
+                                        bottom: 0,
+                                        left: 0,
+                                        right: 0,
+                                        child: Center(
+                                          child: SingleChildScrollView(
+                                            scrollDirection: Axis.horizontal,
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: List.generate(
+                                                  projects.length, (index) {
+                                                final selected =
+                                                    index == _activeIndex;
+                                                return Semantics(
+                                                  button: true,
+                                                  label: isArabic
+                                                      ? '\u0627\u0644\u0645\u0634\u0631\u0648\u0639 ${index + 1}'
+                                                      : 'Project ${index + 1}',
+                                                  child: SizedBox(
+                                                    width: AppLayout
+                                                        .minTouchTarget,
+                                                    height: AppLayout
+                                                        .minTouchTarget,
+                                                    child: InkWell(
+                                                      onTap: () => _goTo(index,
+                                                          projects.length),
                                                       borderRadius:
                                                           BorderRadius.circular(
-                                                              20),
+                                                              24),
+                                                      child: Center(
+                                                        child:
+                                                            AnimatedContainer(
+                                                          duration: dotDuration,
+                                                          width: selected
+                                                              ? 18
+                                                              : 10,
+                                                          height: 10,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: selected
+                                                                ? const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    132,
+                                                                    105,
+                                                                    7)
+                                                                : _aqua
+                                                                    .withValues(
+                                                                        alpha:
+                                                                            .85),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                          ),
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                              ),
+                                                );
+                                              }),
                                             ),
-                                          );
-                                        }),
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
+                              );
+                            },
                           ),
                         ),
                       );
@@ -411,6 +560,30 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                             : 'Next project',
                         onPressed: () => _move(1, projects.length),
                         icon: const Icon(Icons.arrow_forward_ios, color: _aqua),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        isPhone
+                            ? Icons.swap_vert_rounded
+                            : Icons.keyboard_arrow_down_rounded,
+                        size: 14,
+                        color: _aqua.withValues(alpha: .7),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        isArabic
+                            ? 'اسحب لاستكشاف المشاريع'
+                            : 'Scroll to explore projects',
+                        style: GoogleFonts.inter(
+                          color: Colors.white.withValues(alpha: .42),
+                          fontSize: 10,
+                          letterSpacing: isArabic ? 0 : 1.2,
+                        ),
                       ),
                     ],
                   ),
@@ -507,54 +680,54 @@ class _HorizontalViewportClipper extends CustomClipper<Rect> {
       oldClipper.verticalExtent != verticalExtent;
 }
 
-class _CarouselCardPosition extends StatelessWidget {
-  const _CarouselCardPosition({
+class _CoverflowCard extends StatelessWidget {
+  const _CoverflowCard({
     super.key,
-    required this.width,
-    required this.height,
-    required this.left,
-    required this.top,
-    required this.rotation,
-    required this.active,
+    required this.relative,
+    required this.step,
+    required this.depthStep,
+    required this.perspective,
     required this.onTap,
     required this.child,
   });
 
-  final double width;
-  final double height;
-  final double left;
-  final double top;
-  final double rotation;
-  final bool active;
+  final double relative;
+  final double step;
+  final double depthStep;
+  final double perspective;
   final VoidCallback onTap;
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => AnimatedPositioned(
-        duration: const Duration(milliseconds: 650),
-        curve: Curves.easeInOutCubic,
-        left: left,
-        top: top,
-        width: width,
-        height: height,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 650),
-          curve: Curves.easeInOutCubic,
-          transformAlignment: Alignment.center,
-          transform: Matrix4.identity()
-            ..setEntry(3, 2, .0012)
-            ..rotateY(rotation)
-            ..scale(active ? 1.0 : .92),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: onTap,
-              borderRadius: BorderRadius.circular(32),
-              child: child,
-            ),
+  Widget build(BuildContext context) {
+    final distance = relative.abs();
+    final extra = math.max(0.0, distance - 1);
+    final x = relative * step * (1 + extra * .16);
+    final y = distance * 8;
+    final z = distance * depthStep + extra * depthStep * .35;
+    final rotationY = (-relative * .28).clamp(-.78, .78);
+    final scale = 1 / (1 + distance * .16 + extra * .08);
+    final matrix = Matrix4.identity()
+      ..setEntry(3, 2, perspective)
+      ..translate(x, y, z)
+      ..rotateY(rotationY)
+      ..scale(scale);
+
+    return RepaintBoundary(
+      child: Transform(
+        transform: matrix,
+        alignment: Alignment.center,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(30),
+            child: child,
           ),
         ),
-      );
+      ),
+    );
+  }
 }
 
 class _FeaturedProjectCard extends StatelessWidget {
@@ -1785,8 +1958,10 @@ class _DesktopMobileCluster extends StatelessWidget {
     required this.active,
   });
 
-  static const _desktopAspect = 1.6;
-  static const _mobileAspect = 345 / 723;
+  static const _desktopAspect = 1805 / 947;
+  static const _mobileAspect = 387 / 860;
+  static const _frameHorizontalInset = 14.0;
+  static const _frameVerticalInset = 2.0;
 
   final List<String> images;
   final bool wide;
@@ -1803,10 +1978,15 @@ class _DesktopMobileCluster extends StatelessWidget {
           width * (tall ? .84 : .98),
           (height * (tall ? .62 : 1.08)) * _desktopAspect + 12,
         );
-        final baseMonitorHeight = (baseMonitorWidth - 12) / _desktopAspect + 34;
+        final baseMonitorHeight =
+            (baseMonitorWidth - _frameHorizontalInset) / _desktopAspect +
+                _frameVerticalInset +
+                31;
         final monitorWidth = baseMonitorWidth * (wide ? 1.3 : 1.0);
-        final screenHeight = (monitorWidth - 12) / _desktopAspect;
-        final monitorHeight = screenHeight + 34;
+        final screenHeight =
+            (monitorWidth - _frameHorizontalInset) / _desktopAspect +
+                _frameVerticalInset;
+        final monitorHeight = screenHeight + 31;
         final phoneTargetHeight = baseMonitorHeight * (tall ? .66 : .62);
         final basePhoneWidth = math.min(
           math.max(

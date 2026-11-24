@@ -10,9 +10,16 @@ import '../utils/responsive_helper.dart';
 import '../widgets/optimized_image.dart';
 
 class ContactSection extends StatelessWidget {
-  const ContactSection({super.key});
+  const ContactSection({
+    super.key,
+    this.onNavigate,
+    this.onBackToTop,
+  });
 
   static const _aqua = Color(0xFF52D8DE);
+
+  final ValueChanged<int>? onNavigate;
+  final VoidCallback? onBackToTop;
 
   @override
   Widget build(BuildContext context) => ValueListenableBuilder<bool>(
@@ -130,7 +137,11 @@ class ContactSection extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 52),
-                const _ReferenceFooter(),
+                _PortfolioFooter(
+                  isArabic: isArabic,
+                  onNavigate: onNavigate,
+                  onBackToTop: onBackToTop,
+                ),
               ],
             ),
           );
@@ -524,25 +535,357 @@ class _MessageField extends StatelessWidget {
       );
 }
 
-class _ReferenceFooter extends StatelessWidget {
-  const _ReferenceFooter();
+class _PortfolioFooter extends StatelessWidget {
+  const _PortfolioFooter({
+    required this.isArabic,
+    this.onNavigate,
+    this.onBackToTop,
+  });
+
+  static const _aqua = Color(0xFF52D8DE);
+  static const _gold = Color(0xFFFFC900);
+
+  static const _socials = <(IconData, String, String)>[
+    (Icons.code, 'GitHub', PortfolioData.githubUrl),
+    (Icons.link, 'LinkedIn', PortfolioData.linkedinUrl),
+    (Icons.alternate_email, 'Email', 'mailto:${PortfolioData.email}'),
+    (
+      Icons.camera_alt_outlined,
+      'Instagram',
+      'https://instagram.com/moneeb_salah6'
+    ),
+  ];
+
+  final bool isArabic;
+  final ValueChanged<int>? onNavigate;
+  final VoidCallback? onBackToTop;
 
   @override
-  Widget build(BuildContext context) => Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 28),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFC900),
-          borderRadius: BorderRadius.circular(18),
+  Widget build(BuildContext context) {
+    final wide = MediaQuery.sizeOf(context).width > 760;
+    final content = Padding(
+      padding: EdgeInsets.all(wide ? 34 : 22),
+      child: wide
+          ? Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(flex: 4, child: _brand(context)),
+                const SizedBox(width: 22),
+                Expanded(flex: 3, child: _explore()),
+                const SizedBox(width: 22),
+                Expanded(flex: 3, child: _contact(context)),
+                const SizedBox(width: 22),
+                Expanded(flex: 3, child: _social(context)),
+              ],
+            )
+          : Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _brand(context),
+                const SizedBox(height: 28),
+                _explore(),
+                const SizedBox(height: 28),
+                _contact(context),
+                const SizedBox(height: 28),
+                _social(context),
+              ],
+            ),
+    );
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF073A40), Color(0xFF041E23)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Text(
-          '© ${DateTime.now().year} ${PortfolioData.name} · Built with Flutter',
-          textAlign: TextAlign.center,
-          style: GoogleFonts.inter(
-            color: const Color(0xFF17383A),
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
+        border: Border.all(color: _gold.withValues(alpha: .28)),
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            content,
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: wide ? 34 : 22,
+                vertical: 16,
+              ),
+              decoration: BoxDecoration(
+                color: _gold.withValues(alpha: .08),
+                border: Border(
+                  top: BorderSide(color: _gold.withValues(alpha: .2)),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '© ${DateTime.now().year} ${PortfolioData.name} · ${isArabic ? 'صُمم وبُني بـ Flutter' : 'Designed & built with Flutter'}',
+                      style: GoogleFonts.inter(
+                        color: Colors.white70,
+                        fontSize: 11,
+                        height: 1.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Material(
+                    color: _gold.withValues(alpha: .14),
+                    borderRadius: BorderRadius.circular(12),
+                    child: InkWell(
+                      onTap: onBackToTop ?? () => _scrollToTop(context),
+                      borderRadius: BorderRadius.circular(12),
+                      child: SizedBox(
+                        width: 42,
+                        height: 42,
+                        child: Icon(
+                          Icons.keyboard_arrow_up_rounded,
+                          color: _gold,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _brand(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: _gold,
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: Center(
+                  child: Text(
+                    PortfolioData.name.trim().isEmpty
+                        ? 'M'
+                        : PortfolioData.name.trim()[0].toUpperCase(),
+                    style: GoogleFonts.orbitron(
+                      color: const Color(0xFF17383A),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  PortfolioData.name,
+                  style: GoogleFonts.orbitron(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Text(
+            isArabic
+                ? 'مطور Flutter ومصمم واجهات يبني تجارب عملية بواجهات واضحة وأداء حقيقي.'
+                : 'Flutter developer and UI designer building practical experiences with clear interfaces and real performance.',
+            style: GoogleFonts.inter(
+              color: Colors.white70,
+              fontSize: 12,
+              height: 1.7,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.greenAccent.withValues(alpha: .1),
+              border:
+                  Border.all(color: Colors.greenAccent.withValues(alpha: .4)),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.circle, size: 8, color: Colors.greenAccent),
+                const SizedBox(width: 8),
+                Text(
+                  isArabic ? 'متاح للمشاريع الجديدة' : 'Available for new work',
+                  style: GoogleFonts.inter(
+                    color: Colors.greenAccent,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+
+  Widget _explore() => _footerColumn(
+        title: isArabic ? 'استكشف' : 'Explore',
+        children: [
+          for (var index = 0; index < PortfolioData.navItems.length; index++)
+            _footerLink(
+              label: PortfolioData.navItems[index],
+              onTap: () => onNavigate?.call(index),
+            ),
+        ],
+      );
+
+  Widget _contact(BuildContext context) => _footerColumn(
+        title: isArabic ? 'تواصل مباشرة' : 'Reach me',
+        children: [
+          _footerContact(
+            icon: Icons.mail_outline,
+            label: PortfolioData.email,
+            onTap: () => _openLink(
+              context,
+              'mailto:${PortfolioData.email}',
+            ),
+          ),
+          _footerContact(
+            icon: Icons.chat_bubble_outline,
+            label: PortfolioData.whatsapp,
+            onTap: () => _openLink(
+              context,
+              'https://wa.me/${PortfolioData.whatsapp.replaceAll(RegExp(r'[^0-9]'), '')}',
+            ),
+          ),
+          _footerContact(
+            icon: Icons.location_on_outlined,
+            label: isArabic ? 'ليبيا · عن بُعد' : 'Libya · Remote',
+            onTap: null,
+          ),
+        ],
+      );
+
+  Widget _social(BuildContext context) => _footerColumn(
+        title: isArabic ? 'تابعني' : 'Follow',
+        children: [
+          for (final social in _socials)
+            _footerContact(
+              icon: social.$1,
+              label: social.$2,
+              onTap: () => _openLink(context, social.$3),
+            ),
+        ],
+      );
+
+  Widget _footerColumn({
+    required String title,
+    required List<Widget> children,
+  }) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: GoogleFonts.orbitron(
+              color: _gold,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 1.6,
+            ),
+          ),
+          const SizedBox(height: 14),
+          ...children,
+        ],
+      );
+
+  Widget _footerLink({required String label, required VoidCallback onTap}) =>
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: InkWell(
+          onTap: onTap,
+          child: Row(
+            children: [
+              const Icon(Icons.arrow_forward_ios_rounded,
+                  size: 11, color: _aqua),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  label,
+                  style: GoogleFonts.inter(
+                    color: Colors.white.withValues(alpha: .78),
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       );
+
+  Widget _footerContact({
+    required IconData icon,
+    required String label,
+    required VoidCallback? onTap,
+  }) =>
+      Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(10),
+          child: Row(
+            children: [
+              Icon(icon, size: 16, color: _aqua),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  label,
+                  style: GoogleFonts.inter(
+                    color: Colors.white.withValues(alpha: .78),
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+
+  Future<void> _openLink(BuildContext context, String url) async {
+    final uri = Uri.parse(url);
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      }
+    } catch (_) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isArabic ? 'تعذر فتح الرابط.' : 'Could not open this link.',
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _scrollToTop(BuildContext context) async {
+    final position = Scrollable.of(context).position;
+    await position.animateTo(
+      0,
+      duration: const Duration(milliseconds: 700),
+      curve: Curves.easeInOutCubic,
+    );
+  }
 }
