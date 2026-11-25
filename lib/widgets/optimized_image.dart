@@ -32,6 +32,8 @@ class OptimizedAssetRegistry {
         'assets/images/optimized/doctor_leandek_login_400.webp',
     'assets/images/doctor_leandek_main.png':
         'assets/images/optimized/doctor_leandek_main_387.webp',
+    'assets/images/sidaliti_login.png':
+        'assets/images/optimized/sidaliti_login_393.webp',
     'assets/images/torrance_website_desktop.jpg':
         'assets/images/optimized/torrance_desktop_1200.webp',
     'assets/images/torrance_website_mobile.png':

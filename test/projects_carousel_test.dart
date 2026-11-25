@@ -319,6 +319,54 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('Sidaliti screenshot pixel-fits its phone frame on desktop',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(1280, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(child: ProjectsSection()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Next project'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sidaliti'), findsOneWidget);
+    expect(find.text('02 / 10'), findsOneWidget);
+    _expectImageAspect(tester, 'assets/images/sidaliti_login.png', 393 / 852);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('Sidaliti screenshot pixel-fits its phone frame on mobile',
+      (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(400, 1200);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: Scaffold(
+          body: SingleChildScrollView(child: ProjectsSection()),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Next project'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Sidaliti'), findsOneWidget);
+    expect(find.text('02 / 10'), findsOneWidget);
+    _expectImageAspect(tester, 'assets/images/sidaliti_login.png', 393 / 852);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('Feedme screenshots pixel-fit their phone frames',
       (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1280, 1200);
@@ -361,6 +409,10 @@ void main() {
         compact: true,
       ),
       'assets/images/optimized/smart-clinic-800.webp',
+    );
+    expect(
+      OptimizedAssetRegistry.resolve('assets/images/sidaliti_login.png'),
+      'assets/images/optimized/sidaliti_login_393.webp',
     );
     expect(
       OptimizedAssetRegistry.resolve('assets/images/whatsapp_logo.webp'),

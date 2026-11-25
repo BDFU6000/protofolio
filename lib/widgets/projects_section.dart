@@ -1698,6 +1698,7 @@ class _PhoneCluster extends StatelessWidget {
     'assets/images/Main Page.png': 428 / 913,
     'assets/images/doctor_leandek_login.png': 400 / 862,
     'assets/images/doctor_leandek_main.png': 387 / 852,
+    'assets/images/sidaliti_login.png': 393 / 852,
     'assets/images/Shopping Page.png': 321 / 685,
     'assets/images/Products detiaes Page.png': 428 / 913,
     'assets/images/Cart Page.png': 428 / 913,

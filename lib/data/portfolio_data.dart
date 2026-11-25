@@ -366,6 +366,9 @@ I have led university project teams as part of my academic work, coordinating ta
       emoji: '📱',
       gradientColors: [0xFF0f172a, 0xFF1d4ed8],
       completionDate: '2025',
+      imageUrl: 'assets/images/sidaliti_login.png',
+      featuredVisual: 'mobile',
+      featuredImages: ['assets/images/sidaliti_login.png'],
       detailedSections: [
         ProjectDetailSection(
           title: 'دور المشروع',
@@ -797,6 +800,9 @@ I have led university project teams as part of my academic work, coordinating ta
       emoji: '📱',
       gradientColors: [0xFF0f172a, 0xFF1d4ed8],
       completionDate: '2025',
+      imageUrl: 'assets/images/sidaliti_login.png',
+      featuredVisual: 'mobile',
+      featuredImages: ['assets/images/sidaliti_login.png'],
       detailedSections: [
         ProjectDetailSection(
           title: 'Project Role',
