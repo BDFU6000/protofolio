@@ -39,8 +39,10 @@
   <link rel="manifest" href="manifest.json">
   <script type="module">
     import { inject } from "vercel-analytics.mjs";
+    import { injectSpeedInsights } from "vercel-speed-insights.mjs";
 
     inject();
+    injectSpeedInsights();
   </script>
 </head>
 <body>
