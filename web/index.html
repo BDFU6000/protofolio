@@ -38,9 +38,15 @@
   <title>Abdalmoneeb Abusetta — Portfolio</title>
   <link rel="manifest" href="manifest.json">
   <script type="module">
-    import { inject } from "vercel-analytics.mjs";
+    import { inject } from "./vercel-analytics.mjs";
 
-    inject();
+    // Initialize Vercel Web Analytics
+    // The inject() function will load the analytics script from Vercel's CDN
+    // and automatically handle pageview tracking
+    inject({
+      mode: 'production',
+      debug: false
+    });
   </script>
 </head>
 <body>
