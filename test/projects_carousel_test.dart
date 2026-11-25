@@ -35,7 +35,8 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('mouse wheel advances the coverflow without scrolling the page',
+  testWidgets(
+      'horizontal mouse wheel advances the coverflow without scrolling the page',
       (WidgetTester tester) async {
     tester.view.physicalSize = const Size(1280, 1200);
     tester.view.devicePixelRatio = 1;
@@ -61,7 +62,7 @@ void main() {
     );
     final pointer = TestPointer(1, PointerDeviceKind.mouse);
     await tester.sendEventToBinding(pointer.hover(center));
-    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 120)));
+    await tester.sendEventToBinding(pointer.scroll(const Offset(120, 0)));
     await tester.pumpAndSettle();
 
     expect(find.text('02 / 10'), findsOneWidget);
@@ -69,7 +70,8 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('vertical drag advances the coverflow without scrolling the page',
+  testWidgets(
+      'horizontal drag advances the coverflow without scrolling the page',
       (WidgetTester tester) async {
     tester.view.physicalSize = const Size(400, 1200);
     tester.view.devicePixelRatio = 1;
@@ -93,7 +95,7 @@ void main() {
     final center = tester.getCenter(
       find.byKey(const Key('featured-coverflow-stage')),
     );
-    await tester.dragFrom(center, const Offset(0, -120));
+    await tester.dragFrom(center, const Offset(-120, 0));
     await tester.pumpAndSettle();
 
     expect(find.text('02 / 10'), findsOneWidget);
@@ -101,9 +103,10 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('wheel at the last project lets the page continue scrolling',
+  testWidgets(
+      'vertical wheel scrolls the page without changing the coverflow',
       (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(1280, 1200);
+    tester.view.physicalSize = const Size(1280, 700);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -137,9 +140,10 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('downward drag at first project lets the page continue scrolling',
+  testWidgets(
+      'vertical drag scrolls the page without changing the coverflow',
       (WidgetTester tester) async {
-    tester.view.physicalSize = const Size(400, 1200);
+    tester.view.physicalSize = const Size(400, 700);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -157,6 +161,8 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    pageController.jumpTo(100);
+    await tester.pumpAndSettle();
 
     final center = tester.getCenter(
       find.byKey(const Key('featured-coverflow-stage')),
@@ -165,7 +171,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('01 / 10'), findsOneWidget);
-    expect(pageController.offset, greaterThan(0));
+    expect(pageController.offset, lessThan(100));
     expect(tester.takeException(), isNull);
   });
 

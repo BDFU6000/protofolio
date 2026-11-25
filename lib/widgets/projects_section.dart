@@ -58,21 +58,27 @@ class _ProjectsSectionState extends State<ProjectsSection> {
     });
   }
 
+  bool _canNavigate(bool next, int count) {
+    if (count <= 1) return false;
+    return next ? _activeIndex < count - 1 : _activeIndex > 0;
+  }
+
   void _handleWheel(PointerScrollEvent event, int count) {
+    final dx = event.scrollDelta.dx;
+    final dy = event.scrollDelta.dy;
+    if (dx.abs() <= dy.abs() || !_canNavigate(dx > 0, count)) return;
     GestureBinding.instance.pointerSignalResolver.register(event, (_) {
-      final delta = event.scrollDelta.dy;
-      if (delta == 0) return;
-      if (_wheelDelta != 0 && (_wheelDelta > 0) != (delta > 0)) {
+      if (_wheelDelta != 0 && (_wheelDelta > 0) != (dx > 0)) {
         _wheelDelta = 0;
       }
-      _wheelDelta += delta;
+      _wheelDelta += dx;
       final now = DateTime.now();
       final last = _lastWheelNavigation;
       if (_wheelDelta.abs() < _wheelThreshold ||
           (last != null && now.difference(last) < _navigationCooldown)) {
         return;
       }
-      _move(_wheelDelta > 0 ? 1 : -1, count);
+      _move(dx > 0 ? 1 : -1, count);
       _wheelDelta = 0;
       _lastWheelNavigation = now;
     });
@@ -85,7 +91,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
   }
 
   void _updateDrag(DragUpdateDetails details, int count) {
-    _dragDelta -= details.delta.dy;
+    _dragDelta -= details.delta.dx;
     if (_dragHandled || _dragDelta.abs() < _dragThreshold) return;
     _move(_dragDelta > 0 ? 1 : -1, count);
     _dragHandled = true;
@@ -328,7 +334,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                       final topInset = 64.0;
                       final bottomInset = 52.0;
                       final step = cardWidth *
-                          (isPhone ? 1.02 : (width < 600 ? .82 : .68));
+                          (isPhone ? 1.08 : (width < 600 ? 1.02 : 1.0));
                       final depthStep = isPhone ? 48.0 : 72.0;
                       final perspective = isPhone ? .0016 : .0012;
                       final reduceMotion =
@@ -366,20 +372,29 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                             _handleWheel(event, projects.length);
                           }
                         },
-                        child: GestureDetector(
+                        child: RawGestureDetector(
                           behavior: HitTestBehavior.opaque,
-                          onVerticalDragStart: (_) => _startDrag(),
-                          onVerticalDragUpdate: (details) =>
-                              _updateDrag(details, projects.length),
-                          onVerticalDragEnd: (_) {
-                            _dragDelta = 0;
-                            _dragHandled = false;
-                          },
-                          onHorizontalDragEnd: (details) {
-                            final velocity = details.primaryVelocity ?? 0;
-                            if (velocity.abs() > 100) {
-                              _move(velocity < 0 ? 1 : -1, projects.length);
-                            }
+                          gestures: <Type,
+                              GestureRecognizerFactory<GestureRecognizer>>{
+                            HorizontalDragGestureRecognizer:
+                                GestureRecognizerFactoryWithHandlers<
+                                    HorizontalDragGestureRecognizer>(
+                              () => HorizontalDragGestureRecognizer(),
+                              (instance) {
+                                instance.onStart = (_) => _startDrag();
+                                instance.onUpdate = (details) =>
+                                    _updateDrag(details, projects.length);
+                                instance.onEnd = (details) {
+                                  final velocity = details.primaryVelocity ?? 0;
+                                  if (!_dragHandled && velocity.abs() > 100) {
+                                    _move(
+                                        velocity < 0 ? 1 : -1, projects.length);
+                                  }
+                                  _dragDelta = 0;
+                                  _dragHandled = false;
+                                };
+                              },
+                            ),
                           },
                           child: TweenAnimationBuilder<double>(
                             tween: Tween<double>(begin: 0, end: _position),
@@ -569,20 +584,23 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                     children: [
                       Icon(
                         isPhone
-                            ? Icons.swap_vert_rounded
-                            : Icons.keyboard_arrow_down_rounded,
+                            ? Icons.swap_horiz_rounded
+                            : Icons.keyboard_arrow_right_rounded,
                         size: 14,
                         color: _aqua.withValues(alpha: .7),
                       ),
                       const SizedBox(width: 6),
-                      Text(
-                        isArabic
-                            ? 'اسحب لاستكشاف المشاريع'
-                            : 'Scroll to explore projects',
-                        style: GoogleFonts.inter(
-                          color: Colors.white.withValues(alpha: .42),
-                          fontSize: 10,
-                          letterSpacing: isArabic ? 0 : 1.2,
+                      Flexible(
+                        child: Text(
+                          isArabic
+                              ? 'اسحب يمينًا أو يسارًا'
+                              : 'Swipe sideways to explore',
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(
+                            color: Colors.white.withValues(alpha: .42),
+                            fontSize: 10,
+                            letterSpacing: isArabic ? 0 : 1.2,
+                          ),
                         ),
                       ),
                     ],
